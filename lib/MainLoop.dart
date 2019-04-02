@@ -1,15 +1,26 @@
 import 'dart:ui';
-
 import 'package:flame/game.dart';
+import 'package:flutter/gestures.dart';
 
 class MainLoop extends Game{
   
   Size screenSize;
 
+  bool hasWon = false;
+
   @override
   void resize(Size size) {
     super.resize(size);
     screenSize = size;
+  }
+
+  void onTapDown(TapDownDetails d) {
+    double screenCenterX = screenSize.width / 2;
+    double screenCenterY = screenSize.height / 2;
+    hasWon = d.globalPosition.dx >= screenCenterX - 75
+      && d.globalPosition.dx <= screenCenterX + 75
+      && d.globalPosition.dy >= screenCenterY - 75
+      && d.globalPosition.dy <= screenCenterY + 75;
   }
 
   @override
@@ -31,7 +42,9 @@ class MainLoop extends Game{
       150
     );
     Paint boxPaint = Paint();
-    boxPaint.color = Color(0xffffffff);
+    boxPaint.color = hasWon
+      ? Color(0xff00ff00)
+      : Color(0xffffffff);
     canvas.drawRect(boxRect, boxPaint);    
 
   }
@@ -40,5 +53,5 @@ class MainLoop extends Game{
   void update(double t) {
     // TODO: implement update
   }
-
 }
+
