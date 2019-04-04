@@ -15,43 +15,33 @@ class MainLoop extends Game{
   }
 
   void onTapDown(TapDownDetails d) {
-    double screenCenterX = screenSize.width / 2;
-    double screenCenterY = screenSize.height / 2;
-    hasWon = d.globalPosition.dx >= screenCenterX - 75
-      && d.globalPosition.dx <= screenCenterX + 75
-      && d.globalPosition.dy >= screenCenterY - 75
-      && d.globalPosition.dy <= screenCenterY + 75;
+    // Detect target
+
+    // If HUD: react
+    // If target is floor: go to
+    // If target is actor:
+    //    If actor is too far away: go to
+    //    else: act
   }
 
   @override
   void render(Canvas canvas) {
     
-    // Background
-    var bg_rectangle = Rect.fromLTWH(0, 0, screenSize.width, screenSize.height);
-    var bg_paint = Paint();
-    bg_paint.color = Color(0xff1c6ced);
-    canvas.drawRect(bg_rectangle, bg_paint);
+    // Visible tiles: floor
+    // Visible tiles: walls
 
-    // Target
-    double screenCenterX = screenSize.width / 2;
-    double screenCenterY = screenSize.height / 2;
-    Rect boxRect = Rect.fromLTWH(
-      screenCenterX - 75,
-      screenCenterY - 75,
-      150,
-      150
-    );
-    Paint boxPaint = Paint();
-    boxPaint.color = hasWon
-      ? Color(0xff00ff00)
-      : Color(0xffffffff);
-    canvas.drawRect(boxRect, boxPaint);    
+    // Visible actors
+
+    // Player
+
+    // HUD
 
   }
 
   @override
-  void update(double t) {
-    // TODO: implement update
+  void update(double time) {
+    // Player: going
+    // Camera: adjust to player
   }
 }
 
