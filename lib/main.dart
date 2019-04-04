@@ -10,6 +10,7 @@ void  main() async {
   await flameUtil.setOrientation(DeviceOrientation.portraitUp);
 
   var mainLoop = MainLoop();
+  mainLoop.initialize();
 
   var tapRecognizer = TapGestureRecognizer();
   tapRecognizer.onTapDown = mainLoop.onTapDown;

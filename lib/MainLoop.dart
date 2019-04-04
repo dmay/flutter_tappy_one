@@ -3,10 +3,16 @@ import 'package:flame/game.dart';
 import 'package:flutter/gestures.dart';
 
 class MainLoop extends Game{
-  
-  Size screenSize;
 
-  bool hasWon = false;
+  void initialize() {
+    // (1)  Load map
+    // (16) Spawn actors
+    // (2)  Spawn player
+    // (3)  Position camera
+    // (4)  Disable interaction
+  }
+
+  Size screenSize;
 
   @override
   void resize(Size size) {
@@ -15,33 +21,36 @@ class MainLoop extends Game{
   }
 
   void onTapDown(TapDownDetails d) {
-    // Detect target
+    // (5)  Check if interaction enabled
 
-    // If HUD: react
-    // If target is floor: go to
-    // If target is actor:
-    //    If actor is too far away: go to
-    //    else: act
+    // (11) Detect target
+
+    // (15) If HUD: react
+    // (12) If target is floor: go to
+    //      If target is actor:
+    // (18)   If actor is too far away: go to
+    // (19)   else: act
   }
 
   @override
   void render(Canvas canvas) {
     
-    // Visible tiles: floor
-    // Visible tiles: walls
+    // (8) Visible tiles: floor
+    // (9) Visible tiles: walls
 
-    // Visible actors
+    // (17) Visible actors
 
-    // Player
+    // (10) Player
 
-    // HUD
+    // (14) HUD
 
   }
 
   @override
   void update(double time) {
-    // Player: going
-    // Camera: adjust to player
+    // (13) Player: going
+    // (6)  Camera: adjust to player
+    // (7)  If camera is on player and interaction is disabled: enable interaction
   }
 }
 
