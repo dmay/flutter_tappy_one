@@ -1,56 +1,33 @@
 import 'dart:ui';
 import 'package:flame/game.dart';
 import 'package:flutter/gestures.dart';
+import 'package:tappy_one/Scenes/MainMenuScene.dart';
+import 'package:tappy_one/Scenes/SceneBase.dart';
 
 class MainLoop extends Game{
 
-  void initialize() {
-    // (1)  Load map
-    // (16) Spawn actors
-    // (2)  Spawn player
-    // (3)  Position camera
-    // (4)  Camera.FlyTo target
-  }
+  SceneBase activeScene;
 
-  Size screenSize;
+  void initialize() {
+    activeScene = MainMenuScene();
+    // Something something load game state? Or load it on first touch of actual game scene?
+  }
 
   @override
   void resize(Size size) {
     super.resize(size);
-    screenSize = size;
+    activeScene?.resize(size);
   }
 
-  void onTapDown(TapDownDetails d) {
-    // (5)  Check if interaction enabled
-
-    // (11) Detect target
-
-    // (15) If HUD: react
-    // (12) If target is floor: go to
-    //      If target is actor:
-    // (18)   If actor is too far away: go to
-    // (19)   else: act
-  }
+  void onTapDown(TapDownDetails d) 
+    => activeScene?.onTapDown(d);
 
   @override
-  void render(Canvas canvas) {
-    
-    // (8) Visible tiles: floor
-    // (9) Visible tiles: walls
-
-    // (17) Visible actors
-
-    // (10) Player
-
-    // (14) HUD
-
-  }
+  void render(Canvas canvas)
+    => activeScene?.render(canvas);
 
   @override
-  void update(double time) {
-    // (13) Player: going
-    // (6)  Camera: fly OR adjust to player
-    // (7)  If camera is not flying and on player and interaction is disabled: enable interaction
-  }
+  void update(double time)
+    => activeScene?.update(time);
+
 }
-
