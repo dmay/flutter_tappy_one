@@ -9,7 +9,7 @@ class MainLoop extends Game{
     // (16) Spawn actors
     // (2)  Spawn player
     // (3)  Position camera
-    // (4)  Disable interaction
+    // (4)  Camera.FlyTo target
   }
 
   Size screenSize;
@@ -49,8 +49,8 @@ class MainLoop extends Game{
   @override
   void update(double time) {
     // (13) Player: going
-    // (6)  Camera: adjust to player
-    // (7)  If camera is on player and interaction is disabled: enable interaction
+    // (6)  Camera: fly OR adjust to player
+    // (7)  If camera is not flying and on player and interaction is disabled: enable interaction
   }
 }
 
