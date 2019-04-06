@@ -8,12 +8,18 @@ class MainMenuButton extends SpriteComponent{
   String text;
   Rect tapRectangle;
 
-  //NOW mainMenuButton.png
-  MainMenuButton(num x, num y, this.text):super.rectangle(100, 20, 'mainMenuButton.png'){
+  MainMenuButton(num x, num y, num width, num height, this.text, String imagePath)
+    :super.rectangle(width, height, imagePath){
     this.angle = 0.0;
     this.x = x;
     this.y = y;
     this.tapRectangle = Rect.fromLTWH(this.x, this.y, this.width, this.height);
+  }
+
+  @override
+  void render(Canvas canvas){
+    super.render(canvas);
+    //NOW Button - Daw text, if present
   }
 
   void OnTapDown(TapDownDetails d) {
@@ -31,7 +37,10 @@ class MainMenuScene extends SceneBase{
   @override
   void initialize() {
     super.initialize();
-    mainButtons.add(MainMenuButton(10,20, 'Start'));
+    //NOW mainMenuButton.png
+    mainButtons.add(
+      MainMenuButton(10, 20, 100, 20, 'Start', 'mainMenuButton.png')
+      );
   }
 
   void onTapDown(TapDownDetails d) {
