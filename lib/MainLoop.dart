@@ -10,6 +10,7 @@ class MainLoop extends Game{
 
   void initialize() {
     activeScene = MainMenuScene();
+    activeScene.initialize();
     // Something something load game state? Or load it on first touch of actual game scene?
   }
 
