@@ -14,6 +14,7 @@ class ScenesBuilder {
 
   static SceneBase getFirstPlayScene()
     => WalkingDemoScene(
+      getMainMenuScene
     );
 
   static SceneBase getSettingsScene(){
