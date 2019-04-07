@@ -21,4 +21,18 @@ abstract class SceneBase{
   void update(double time) {
   }
 
+  /* Scenes navigation */
+
+  void switchSceneTo(Function buildNextScene){
+    //NOW switchSceneTo
+  }
+
+  void openScene(Function buildNextScene){
+    //NOW openScene
+  }
+
+  void closeScene(){
+    //NOW closeScene
+  }
+
 }

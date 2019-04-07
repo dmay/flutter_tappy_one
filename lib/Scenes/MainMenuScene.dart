@@ -50,6 +50,11 @@ class MainMenuButton extends SpriteComponent {
 class MainMenuScene extends SceneBase {
   List<MainMenuButton> mainButtons = List<MainMenuButton>();
 
+  Function goToPlay;
+  Function openSettings;
+
+  MainMenuScene(this.goToPlay, this.openSettings){}
+
   @override
   void resize(Size size) {
     super.resize(size);
@@ -72,13 +77,13 @@ class MainMenuScene extends SceneBase {
           tileWidth,  verticalCenter - tileHeight * 2,
           buttonWidth, buttonHeight, 
           'Play', 'mainMenuButton.png',
-          goToPlay
+          () => switchSceneTo(goToPlay)
           ));
     mainButtons.add(MainMenuButton(
           tileWidth,  verticalCenter,
           buttonWidth, buttonHeight, 
           'Settings', 'mainMenuButton.png',
-          openSettings
+          () => openScene(openSettings)
           ));
   }
 
@@ -97,14 +102,6 @@ class MainMenuScene extends SceneBase {
 
   void update(double time) {
     // Random events
-  }
-
-  void goToPlay(){
-    //NOW goToPlay
-  }
-
-  void openSettings(){
-    //TODO resetSaveFile
   }
 
 }
