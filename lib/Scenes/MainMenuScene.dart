@@ -64,9 +64,12 @@ class MainMenuScene extends SceneBase {
   @override
   void initialize() {
     super.initialize();
+    _renderMenuButtons();
   }
 
   void _renderMenuButtons() {
+    if(screenSize == null) return;  // Do not render buttons until we get screen size info
+
     mainButtons.clear();
     final tileWidth = screenSize.width / 8;
     final tileHeight = tileWidth * 1.1;

@@ -4,12 +4,21 @@ import 'package:flutter/gestures.dart';
 abstract class SceneBase{
   
   Size screenSize;
+  bool isActive = false;
 
   void resize(Size size) {
     screenSize = size;
   }
 
   void initialize() {
+  }
+
+  void setActive(){
+    this.isActive = true;
+  }
+
+  void setInactive(){
+    this.isActive = false;
   }
 
   void onTapDown(TapDownDetails d) {
@@ -21,18 +30,18 @@ abstract class SceneBase{
   void update(double time) {
   }
 
+  void destroy(){
+  }
+
   /* Scenes navigation */
 
-  void switchSceneTo(Function buildNextScene){
-    //NOW switchSceneTo
-  }
+  Function switchSceneTo = (Function buildNextScene) 
+    => throw Exception('!!! [SceneBase] call to default switchSceneTo');
 
-  void openScene(Function buildNextScene){
-    //NOW openScene
-  }
+  Function openScene = (Function buildNewScene)
+    => throw Exception('!!! [SceneBase] call to default openScene');
 
-  void closeScene(){
-    //NOW closeScene
-  }
+  Function closeScene = ()
+    => throw Exception('!!! [SceneBase] call to default closeScene');
 
 }

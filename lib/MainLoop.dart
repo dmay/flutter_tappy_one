@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:ui';
 import 'package:flame/game.dart';
 import 'package:flutter/gestures.dart';
@@ -6,17 +7,20 @@ import 'package:tappy_one/ScenesBuilder.dart';
 
 class MainLoop extends Game{
 
+  Size screenSize;
   SceneBase activeScene;
 
   void initialize() {
-    activeScene = ScenesBuilder.getDefaultScene();
-    activeScene.initialize();
+    openScene(ScenesBuilder.getDefaultScene);
+    // activeScene = ScenesBuilder.getDefaultScene();
+    // activeScene.initialize();
     // Something something load game state? Or load it on first touch of actual game scene?
   }
 
   @override
   void resize(Size size) {
     super.resize(size);
+    screenSize = size;
     activeScene?.resize(size);
   }
 
@@ -30,5 +34,60 @@ class MainLoop extends Game{
   @override
   void update(double time)
     => activeScene?.update(time);
+
+  /* Scenes navigation */
+
+  Queue scenesStack = Queue();
+
+  void switchSceneTo(Function buildNextScene){
+    final scene = buildAndSetupScene(buildNextScene);
+    final previousScene = activeScene;
+    previousScene?.setInactive();
+    activeScene = scene;
+    activeScene.setActive();
+    previousScene?.destroy();
+  }
+
+  void openScene(Function buildNewScene){
+    final scene = buildAndSetupScene(buildNewScene);
+    if(activeScene != null){
+        scenesStack.addLast(activeScene);
+        activeScene.setInactive();
+    }
+    activeScene = scene;
+    activeScene.setActive();
+  }
+
+  void closeScene(SceneBase scene){
+    if(scene == activeScene){
+      scene.setInactive();
+      if(scenesStack.isNotEmpty){
+        activeScene = scenesStack.removeLast();
+        activeScene.setActive();
+      }
+      scene.destroy();
+    }
+    else{
+      if(scenesStack.contains(scene))
+        scenesStack.remove(scene);
+      scene.setInactive();
+      scene.destroy();
+    }
+  }
+
+  SceneBase buildAndSetupScene(Function buildScene){
+    final SceneBase scene = buildScene();
+    if(scene == null)
+      throw Exception('scene builder delegate returned null');
+    if(screenSize != null)
+      scene.resize(screenSize);
+    scene.initialize();
+    scene.switchSceneTo = this.switchSceneTo;
+    scene.openScene = this.openScene;
+    scene.closeScene = () => this.closeScene(scene);
+    return scene;
+  }
+
+  
 
 }
