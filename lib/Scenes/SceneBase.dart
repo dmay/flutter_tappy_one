@@ -10,7 +10,7 @@ abstract class SceneBase{
     screenSize = size;
   }
 
-  void initialize() {
+  Future initialize() {
   }
 
   void setActive(){

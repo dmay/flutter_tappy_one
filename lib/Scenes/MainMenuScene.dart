@@ -62,8 +62,8 @@ class MainMenuScene extends SceneBase {
   }
 
   @override
-  void initialize() {
-    super.initialize();
+  Future initialize() async {
+    await super.initialize();
     _renderMenuButtons();
   }
 

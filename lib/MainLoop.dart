@@ -39,8 +39,8 @@ class MainLoop extends Game{
 
   Queue scenesStack = Queue();
 
-  void switchSceneTo(Function buildNextScene){
-    final scene = buildAndSetupScene(buildNextScene);
+  Future switchSceneTo(Function buildNextScene) async {
+    final scene = await buildAndSetupScene(buildNextScene);
     final previousScene = activeScene;
     previousScene?.setInactive();
     activeScene = scene;
@@ -48,8 +48,8 @@ class MainLoop extends Game{
     previousScene?.destroy();
   }
 
-  void openScene(Function buildNewScene){
-    final scene = buildAndSetupScene(buildNewScene);
+  Future openScene(Function buildNewScene) async {
+    final scene = await buildAndSetupScene(buildNewScene);
     if(activeScene != null){
         scenesStack.addLast(activeScene);
         activeScene.setInactive();
@@ -75,13 +75,13 @@ class MainLoop extends Game{
     }
   }
 
-  SceneBase buildAndSetupScene(Function buildScene){
+  Future<SceneBase> buildAndSetupScene(Function buildScene) async{
     final SceneBase scene = buildScene();
     if(scene == null)
       throw Exception('scene builder delegate returned null');
     if(screenSize != null)
       scene.resize(screenSize);
-    scene.initialize();
+    await scene.initialize();
     scene.switchSceneTo = this.switchSceneTo;
     scene.openScene = this.openScene;
     scene.closeScene = () => this.closeScene(scene);

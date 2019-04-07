@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:tappy_one/Scenes/SceneBase.dart';
+import 'package:tiled/tiled.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class WalkingDemoScene extends SceneBase{
 
@@ -8,17 +10,33 @@ class WalkingDemoScene extends SceneBase{
 
   WalkingDemoScene(this.goToMainMenu);
 
+  String mapFileName() => '*.tmx';
+  TileMap map;
+
   @override
-  void initialize() {
-    //NOW (1)  Load map
+  Future initialize() async {
+    // NOW (1)  Load map - ACTUAL MAP
+    final mapXml = await rootBundle.loadString(mapFileName());
+    this.map = TileMapParser().parse(mapXml);
+
     // (16) Spawn actors
     // (2)  Spawn player
     // (3)  Position camera
     // (4)  Camera.FlyTo target
   }
+  bool hasWon = false;
 
   @override
   void onTapDown(TapDownDetails d) {
+     double screenCenterX = screenSize.width / 2;
+    double screenCenterY = screenSize.height / 2;
+    final newHasWon = d.globalPosition.dx >= screenCenterX - 75
+      && d.globalPosition.dx <= screenCenterX + 75
+      && d.globalPosition.dy >= screenCenterY - 75
+      && d.globalPosition.dy <= screenCenterY + 75;
+    if(hasWon && newHasWon)
+      switchSceneTo(goToMainMenu);
+    hasWon = newHasWon;
     // (5)  Check if interaction enabled
 
     // (11) Detect target
@@ -32,6 +50,23 @@ class WalkingDemoScene extends SceneBase{
 
   @override
   void render(Canvas canvas) {
+      var bg_rectangle = Rect.fromLTWH(0, 0, screenSize.width, screenSize.height);
+    var bg_paint = Paint();
+    bg_paint.color = Color(0xff1c6ced);
+    canvas.drawRect(bg_rectangle, bg_paint);
+  double screenCenterX = screenSize.width / 2;
+    double screenCenterY = screenSize.height / 2;
+    Rect boxRect = Rect.fromLTWH(
+      screenCenterX - 75,
+      screenCenterY - 75,
+      150,
+      150
+    );
+    Paint boxPaint = Paint();
+    boxPaint.color = hasWon
+      ? Color(0xff00ff00)
+      : Color(0xffffffff);
+    canvas.drawRect(boxRect, boxPaint); 
     // (8) Visible tiles: floor
     // (9) Visible tiles: walls
 
