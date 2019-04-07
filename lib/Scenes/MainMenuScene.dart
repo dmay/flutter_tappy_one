@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flame/components/component.dart';
 import 'package:flutter/gestures.dart';
 import 'package:tappy_one/Scenes/SceneBase.dart';
-import 'package:flutter/foundation.dart';
 
 class MainMenuButton extends SpriteComponent {
   static const String menuButtonFontFamily = 'Alagard';
@@ -12,8 +11,10 @@ class MainMenuButton extends SpriteComponent {
   String text;
   Rect tapRectangle;
 
+  Function handler;
+
   MainMenuButton(double x, double y, double width, double height, this.text,
-      String imagePath)
+      String imagePath, this.handler)
       : super.rectangle(width, height, imagePath) {
     this.angle = 0.0;
     this.x = x;
@@ -40,11 +41,9 @@ class MainMenuButton extends SpriteComponent {
     }
   }
 
-  void OnTapDown(TapDownDetails d) {
-    if (this.tapRectangle.contains(d.globalPosition)) {
-      debugPrint('tap match!');
-      //NOW Handle button click
-    }
+  void onTapDown(TapDownDetails d) {
+    if (this.tapRectangle.contains(d.globalPosition))
+      handler();
   }
 }
 
@@ -72,15 +71,19 @@ class MainMenuScene extends SceneBase {
     mainButtons.add(MainMenuButton(
           tileWidth,  verticalCenter - tileHeight * 2,
           buttonWidth, buttonHeight, 
-          'Play', 'mainMenuButton.png'));
+          'Play', 'mainMenuButton.png',
+          goToPlay
+          ));
     mainButtons.add(MainMenuButton(
           tileWidth,  verticalCenter,
           buttonWidth, buttonHeight, 
-          'Reset', 'mainMenuButton.png'));
+          'Settings', 'mainMenuButton.png',
+          openSettings
+          ));
   }
 
   void onTapDown(TapDownDetails d) {
-    mainButtons.forEach((button) => button.OnTapDown(d));
+    mainButtons.forEach((button) => button.onTapDown(d));
   }
 
   void render(Canvas canvas) {
@@ -94,6 +97,14 @@ class MainMenuScene extends SceneBase {
 
   void update(double time) {
     // Random events
+  }
+
+  void goToPlay(){
+    //NOW goToPlay
+  }
+
+  void openSettings(){
+    //TODO resetSaveFile
   }
 
 }

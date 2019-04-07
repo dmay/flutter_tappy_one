@@ -1,15 +1,15 @@
 import 'dart:ui';
 import 'package:flame/game.dart';
 import 'package:flutter/gestures.dart';
-import 'package:tappy_one/Scenes/MainMenuScene.dart';
 import 'package:tappy_one/Scenes/SceneBase.dart';
+import 'package:tappy_one/ScenesBuilder.dart';
 
 class MainLoop extends Game{
 
   SceneBase activeScene;
 
   void initialize() {
-    activeScene = MainMenuScene();
+    activeScene = ScenesBuilder.getDefaultScene();
     activeScene.initialize();
     // Something something load game state? Or load it on first touch of actual game scene?
   }
