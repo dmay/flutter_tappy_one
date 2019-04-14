@@ -10,12 +10,11 @@ class WalkingDemoScene extends SceneBase{
 
   WalkingDemoScene(this.goToMainMenu);
 
-  String mapFileName() => '*.tmx';
+  String mapFileName() => 'WalkingDemoScene.tmx';
   TileMap map;
 
   @override
   Future initialize() async {
-    // NOW (1)  Load map - ACTUAL MAP
     final mapXml = await rootBundle.loadString(mapFileName());
     this.map = TileMapParser().parse(mapXml);
 
@@ -42,6 +41,10 @@ class WalkingDemoScene extends SceneBase{
   void render(Canvas canvas) {
     // (8) Visible tiles: floor
     // (9) Visible tiles: walls
+    
+
+    //final image = this.map.layers[0].tiles[0].image.;
+    //canvas.drawImage(image, p, paint);
 
     // (17) Visible actors
 
