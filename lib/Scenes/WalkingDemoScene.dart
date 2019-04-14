@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/gestures.dart';
+import 'package:tappy_one/SceneElements/WalkingCamera.dart';
 import 'package:tappy_one/SceneElements/WalkingPlayer.dart';
 import 'package:tappy_one/Scenes/SceneBase.dart';
 import 'package:tiled/tiled.dart';
@@ -9,6 +10,7 @@ class WalkingDemoScene extends SceneBase {
   /// delegate to navigate back to main menu
   Function goToMainMenu;
 
+
   WalkingDemoScene(this.goToMainMenu);
 
   String mapFileName() => 'assets/WalkingDemoScene.tmx';
@@ -16,6 +18,7 @@ class WalkingDemoScene extends SceneBase {
 
   TileMap map;
   WalkingPlayer player;
+  WalkingCamera camera;
 
   @override
   Future initialize() async {
@@ -32,13 +35,28 @@ class WalkingDemoScene extends SceneBase {
       playerSpawn[1]*this.map.tileHeight + this.map.tileHeight/2
       );
 
-    // (3)  Position camera
-    // (4)  Camera.FlyTo target
+    // Position camera
+    this.camera = WalkingCamera(
+      sceneWidth:  (this.map.tileWidth * this.map.layers[0].width).toDouble(),
+      sceneHeight: (this.map.tileHeight * this.map.layers[0].height).toDouble(),
+      zoom: 10.0,
+      x: this.player.x,
+      y: this.player.y,
+      screenSize: screenSize,
+    );
+    // (9)  Camera.FlyTo target
+  }
+
+  @override
+  void resize(Size size){
+    super.resize(size);
+    this.camera.resize(size);
   }
 
   @override
   void onTapDown(TapDownDetails d) {
-    // (5)  Check if interaction enabled
+    // Check if interaction enabled
+    if(this.camera.isInAction) return;
 
     // (11) Detect target
 
@@ -51,11 +69,8 @@ class WalkingDemoScene extends SceneBase {
 
   @override
   void render(Canvas canvas) {
-    // (8) Visible tiles: floor
-    // (9) Visible tiles: walls
-
-    //final image = this.map.layers[0].tiles[0].image.;
-    //canvas.drawImage(image, p, paint);
+    // (7) Visible tiles: floor
+    // (8) Visible tiles: walls
 
     // (17) Visible actors
 
@@ -66,9 +81,17 @@ class WalkingDemoScene extends SceneBase {
 
   @override
   void update(double time) {
+    super.update(time);
+    if(!isActive) return;
+
     // (13) Player: going
-    // (6)  Camera: fly OR adjust to player
-    // (7)  If camera is not flying and on player and interaction is disabled: enable interaction
+    // (20) Actors: update
+    
+    // Camera: fly OR adjust to player
+    this.camera.update(
+      time:time, 
+      targetX: player.x, 
+      targetY: player.y);
   }
 
   static List locatePlayerOnSpawn(TileMap map, int spawnTileId) {
@@ -86,21 +109,4 @@ class WalkingDemoScene extends SceneBase {
     }
     throw Exception('Map does not have Spawn tile #$spawnTileId in "Pass" layer');
   }
-
-  // List locatePlayerOnSpawn() {
-  //   final passLayer = this
-  //       .map
-  //       .layers
-  //       .firstWhere((l) => l.name.toUpperCase() == 'PASS', orElse: () => null);
-  //   if (passLayer == null) throw Exception('Map does not have "Pass" layer');
-  //   for (var row = 0; row < passLayer.tileMatrix.length; row++) {
-  //     final column = passLayer.tileMatrix[row].indexOf(SpawnTileId);
-  //     if (column >= 0) {
-  //       final x = column * this.map.tileWidth + this.map.tileWidth / 2;
-  //       final y = column * this.map.tileHeight + this.map.tileHeight / 2;
-  //       return [x, y];
-  //     }
-  //   }
-  //   throw Exception('Map does not have Spawn tile #$SpawnTileId in "Pass" layer');
-  // }
 }
