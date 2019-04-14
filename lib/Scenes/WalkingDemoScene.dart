@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:tappy_one/SceneElements/WalkingCamera.dart';
 import 'package:tappy_one/SceneElements/WalkingPlayer.dart';
@@ -20,6 +21,9 @@ class WalkingDemoScene extends SceneBase {
   WalkingPlayer player;
   WalkingCamera camera;
 
+  // State information
+  Rect lastVisibleRect;  
+
   @override
   Future initialize() async {
     // Load map
@@ -39,22 +43,27 @@ class WalkingDemoScene extends SceneBase {
     this.camera = WalkingCamera(
       sceneWidth:  (this.map.tileWidth * this.map.layers[0].width).toDouble(),
       sceneHeight: (this.map.tileHeight * this.map.layers[0].height).toDouble(),
-      zoom: 10.0,
+      zoom: 0.1,
       x: this.player.x,
       y: this.player.y,
-      screenSize: screenSize,
+      screenProportions: screenSize,
     );
+
     // (9)  Camera.FlyTo target
+    // final targets = ListTargets(this.map);
+    // this.camera.flyThrough(targets);
   }
 
   @override
   void resize(Size size){
     super.resize(size);
-    this.camera.resize(size);
+    this.camera?.resize(size);
   }
 
   @override
   void onTapDown(TapDownDetails d) {
+    goToMainMenu();
+
     // Check if interaction enabled
     if(this.camera.isInAction) return;
 
@@ -69,14 +78,46 @@ class WalkingDemoScene extends SceneBase {
 
   @override
   void render(Canvas canvas) {
+    final visibleRect = this.camera.getVisibleRect();
+    this.lastVisibleRect = visibleRect;
+
     // (7) Visible tiles: floor
     // (8) Visible tiles: walls
+    renderMap(canvas, visibleRect);
 
     // (17) Visible actors
 
     // (10) Player
 
     // (14) HUD
+  }
+
+  void renderMap(Canvas canvas, Rect visibleRect) {
+    final rowFrom = (visibleRect.top / map.tileHeight).floor();
+    final rowTo = (visibleRect.bottom / map.tileHeight).ceil();
+    final rowScreenHeight = screenSize.height * map.tileHeight / visibleRect.height;
+    final rowScreenShift = visibleRect.top % map.tileHeight == 0 ? 0 : ((map.tileHeight - visibleRect.top % map.tileHeight)/ map.tileHeight) * rowScreenHeight;
+    final columnFrom = (visibleRect.left / map.tileWidth).floor();
+    final columnTo = (visibleRect.right / map.tileWidth).ceil();
+    final columnScreenWidth = screenSize.width * map.tileWidth / visibleRect.width;
+    final columnScreenShift = visibleRect.left % map.tileWidth == 0 ? 0 : ((map.tileWidth - visibleRect.left % map.tileWidth)/ map.tileWidth) * columnScreenWidth;
+    final paint = Paint()
+      ..color = Color(0xff00ff00)
+      ..style = PaintingStyle.stroke;
+    for (var layerIndex = 0; layerIndex < map.layers.length; layerIndex++) {
+      final layer = map.layers[layerIndex];
+      if(layer.name.toUpperCase() == 'PASS') continue;
+      for(var rowIndex = rowFrom; rowIndex <= rowTo; rowIndex++)
+        for(var columnIndex = columnFrom; columnIndex <= columnTo; columnIndex++){
+          final tileId = layer.tileMatrix[rowIndex][columnIndex];
+          //NOW 2 drop given tileId onto canvas    
+          final screenX = columnScreenShift + (columnIndex - columnFrom)*columnScreenWidth;
+          final screenY = rowScreenShift + (rowIndex - rowFrom)*rowScreenHeight;
+          canvas.drawRect(
+            Rect.fromLTWH(screenX, screenY, columnScreenWidth, rowScreenHeight)
+            , paint);
+        }
+    }    
   }
 
   @override
