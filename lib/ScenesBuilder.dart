@@ -4,7 +4,7 @@ import 'package:tappy_one/Scenes/WalkingDemoScene.dart';
 
 class ScenesBuilder {
 
-  static SceneBase getDefaultScene() => getMainMenuScene();
+  static SceneBase getDefaultScene() => getFirstPlayScene();
 
   static SceneBase getMainMenuScene()
     => MainMenuScene(

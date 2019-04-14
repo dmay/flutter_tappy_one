@@ -12,8 +12,6 @@ class MainLoop extends Game{
 
   void initialize() {
     openScene(ScenesBuilder.getDefaultScene);
-    // activeScene = ScenesBuilder.getDefaultScene();
-    // activeScene.initialize();
     // Something something load game state? Or load it on first touch of actual game scene?
   }
 
@@ -55,6 +53,8 @@ class MainLoop extends Game{
         activeScene.setInactive();
     }
     activeScene = scene;
+    if(screenSize!=null && activeScene.screenSize == null)  // Happend when first scene.initialize is very long
+      activeScene.resize(this.screenSize);
     activeScene.setActive();
   }
 

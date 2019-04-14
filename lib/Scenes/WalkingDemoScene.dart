@@ -78,6 +78,8 @@ class WalkingDemoScene extends SceneBase {
 
   @override
   void render(Canvas canvas) {
+    if(screenSize == null) return;
+
     final visibleRect = this.camera.getVisibleRect();
     this.lastVisibleRect = visibleRect;
 
@@ -110,7 +112,7 @@ class WalkingDemoScene extends SceneBase {
       for(var rowIndex = rowFrom; rowIndex <= rowTo; rowIndex++)
         for(var columnIndex = columnFrom; columnIndex <= columnTo; columnIndex++){
           final tileId = layer.tileMatrix[rowIndex][columnIndex];
-          //NOW 2 drop given tileId onto canvas    
+          //NOW Drop given tileId onto canvas    
           final screenX = columnScreenShift + (columnIndex - columnFrom)*columnScreenWidth;
           final screenY = rowScreenShift + (rowIndex - rowFrom)*rowScreenHeight;
           canvas.drawRect(
