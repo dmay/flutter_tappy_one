@@ -44,6 +44,7 @@ flutter:
   assets:
    - assets/images/mainMenuButton.png
    - WalkingDemoScene.tmx
+   - assets/images/terrain.png
 
   fonts:
     - family: Alagard

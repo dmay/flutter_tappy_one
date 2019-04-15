@@ -28,7 +28,7 @@ class WalkingCamera{
 
   Rect getVisibleRect() {
     //NOW WalkingCamera.getVisibleRect
-    return Rect.fromLTWH(0, 0, sceneWidth*zoom, sceneHeight*zoom);
+    return Rect.fromLTWH(0, 0, sceneWidth*zoom*5, sceneHeight);
   }
 
 

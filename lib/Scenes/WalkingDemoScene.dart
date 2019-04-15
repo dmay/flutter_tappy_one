@@ -1,23 +1,30 @@
 import 'dart:ui';
+import 'package:flame/palette.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:tappy_one/SceneElements/WalkingCamera.dart';
 import 'package:tappy_one/SceneElements/WalkingPlayer.dart';
 import 'package:tappy_one/Scenes/SceneBase.dart';
-import 'package:tiled/tiled.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:tiled/tiled.dart' as Tiled;
+import 'package:flame/flame.dart';
 
 class WalkingDemoScene extends SceneBase {
+
   /// delegate to navigate back to main menu
   Function goToMainMenu;
 
-
   WalkingDemoScene(this.goToMainMenu);
 
-  String mapFileName() => 'assets/WalkingDemoScene.tmx';
+  String mapFileName() => 'WalkingDemoScene.tmx';
+  String tilesetFileName() => 'terrain.png';
+  static const num tilesetWidth = 32;
+  static const num tilesetHeight = 32;
+  static const num tilesetTileWidth = 32.0;
+  static const num tilesetTileHeight = 32.0;
   static const int SpawnTileId = 926;
 
-  TileMap map;
+  Tiled.TileMap map;
+  Image tilesetImage;
   WalkingPlayer player;
   WalkingCamera camera;
 
@@ -27,8 +34,9 @@ class WalkingDemoScene extends SceneBase {
   @override
   Future initialize() async {
     // Load map
-    final mapXml = await rootBundle.loadString(mapFileName());
-    this.map = TileMapParser().parse(mapXml);
+    final mapXml = await Flame.assets.readFile(mapFileName());
+    this.map = Tiled.TileMapParser().parse(mapXml);
+    this.tilesetImage = await Flame.images.load(tilesetFileName());
 
     // (16) Spawn actors
 
@@ -83,8 +91,6 @@ class WalkingDemoScene extends SceneBase {
     final visibleRect = this.camera.getVisibleRect();
     this.lastVisibleRect = visibleRect;
 
-    // (7) Visible tiles: floor
-    // (8) Visible tiles: walls
     renderMap(canvas, visibleRect);
 
     // (17) Visible actors
@@ -92,32 +98,37 @@ class WalkingDemoScene extends SceneBase {
     // (10) Player
 
     // (14) HUD
+
+    // (9) FPS rate
   }
 
   void renderMap(Canvas canvas, Rect visibleRect) {
     final rowFrom = (visibleRect.top / map.tileHeight).floor();
-    final rowTo = (visibleRect.bottom / map.tileHeight).ceil();
-    final rowScreenHeight = screenSize.height * map.tileHeight / visibleRect.height;
-    final rowScreenShift = visibleRect.top % map.tileHeight == 0 ? 0 : ((map.tileHeight - visibleRect.top % map.tileHeight)/ map.tileHeight) * rowScreenHeight;
+    final rowTo = (visibleRect.bottom / map.tileHeight).ceil() -1;
+    final screenRowHeight = screenSize.height * map.tileHeight / visibleRect.height;
+    final rowScreenShift = visibleRect.top % map.tileHeight == 0 ? 0 : ((map.tileHeight - visibleRect.top % map.tileHeight)/ map.tileHeight) * screenRowHeight;
     final columnFrom = (visibleRect.left / map.tileWidth).floor();
-    final columnTo = (visibleRect.right / map.tileWidth).ceil();
-    final columnScreenWidth = screenSize.width * map.tileWidth / visibleRect.width;
-    final columnScreenShift = visibleRect.left % map.tileWidth == 0 ? 0 : ((map.tileWidth - visibleRect.left % map.tileWidth)/ map.tileWidth) * columnScreenWidth;
-    final paint = Paint()
-      ..color = Color(0xff00ff00)
-      ..style = PaintingStyle.stroke;
+    final columnTo = (visibleRect.right / map.tileWidth).ceil() -1;
+    final screenColumnWidth = screenSize.width * map.tileWidth / visibleRect.width;
+    final columnScreenShift = visibleRect.left % map.tileWidth == 0 ? 0 : ((map.tileWidth - visibleRect.left % map.tileWidth)/ map.tileWidth) * screenColumnWidth;
+    final fullPaint = BasicPalette.white.paint;
     for (var layerIndex = 0; layerIndex < map.layers.length; layerIndex++) {
       final layer = map.layers[layerIndex];
       if(layer.name.toUpperCase() == 'PASS') continue;
       for(var rowIndex = rowFrom; rowIndex <= rowTo; rowIndex++)
         for(var columnIndex = columnFrom; columnIndex <= columnTo; columnIndex++){
-          final tileId = layer.tileMatrix[rowIndex][columnIndex];
-          //NOW Drop given tileId onto canvas    
-          final screenX = columnScreenShift + (columnIndex - columnFrom)*columnScreenWidth;
-          final screenY = rowScreenShift + (rowIndex - rowFrom)*rowScreenHeight;
-          canvas.drawRect(
-            Rect.fromLTWH(screenX, screenY, columnScreenWidth, rowScreenHeight)
-            , paint);
+          final tileId = layer.tileMatrix[rowIndex][columnIndex] -1;
+          final tilesetX = (tileId % tilesetWidth) * tilesetTileWidth;
+          final tilesetY = (tileId / tilesetHeight).floor() * tilesetTileHeight;
+          final tilesetPosition = Rect.fromLTWH(
+            tilesetX, tilesetY, 
+            tilesetTileWidth, tilesetTileHeight);
+          final screenX = columnScreenShift + (columnIndex - columnFrom)*screenColumnWidth;
+          final screenY = rowScreenShift + (rowIndex - rowFrom)*screenRowHeight;
+          final screenPosition = Rect.fromLTWH(
+            screenX, screenY, 
+            screenColumnWidth, screenRowHeight);
+          canvas.drawImageRect(tilesetImage, tilesetPosition, screenPosition, fullPaint);
         }
     }    
   }
@@ -137,7 +148,7 @@ class WalkingDemoScene extends SceneBase {
       targetY: player.y);
   }
 
-  static List locatePlayerOnSpawn(TileMap map, int spawnTileId) {
+  static List locatePlayerOnSpawn(Tiled.TileMap map, int spawnTileId) {
     final passLayer = map
         .layers
         .firstWhere((l) => l.name.toUpperCase() == 'PASS', orElse: () => null);
