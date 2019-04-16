@@ -191,6 +191,7 @@ class WalkingDemoScene extends SceneBase {
         y: t.y - t.height/2,
         stayTimeSec: 0.5,
       )));
+      result.add(CameraFlythroughStep(flyTimeSec: 1.0, x:player.x, y:player.y, stayTimeSec: 0.5));
       return result;
   }
 }

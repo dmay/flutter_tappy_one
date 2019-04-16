@@ -1,6 +1,13 @@
+import 'dart:collection';
 import 'dart:ui';
 import 'package:meta/meta.dart';
 import 'package:tappy_one/SceneElements/CameraFlythroughStep.dart';
+
+enum CameraAction{
+  none,
+  flyTo,
+  stareAt,
+}
 
 class WalkingCamera {
   double sceneWidth;
@@ -12,6 +19,11 @@ class WalkingCamera {
   double y;
   bool isInAction;
   Size screenProportions;
+
+  Queue<CameraFlythroughStep> flythroughTargets = Queue<CameraFlythroughStep>();
+  CameraFlythroughStep _currentFlythroughTarget;
+  CameraAction _currentAction = CameraAction.none;
+  num _currentTimeLeft = 0.0;
 
   WalkingCamera(
       {@required this.sceneWidth,
@@ -30,10 +42,32 @@ class WalkingCamera {
   }
 
   void update({@required double time, double targetX, double targetY}) {
-    //NOW WalkingCamera.update
-    //  keep target in the center box, shift own
-    //  position only when target moves away
-    //  if target moves away for > 3 sec - aim on it when it stoped
+    switch(_currentAction){
+      case CameraAction.none:
+        //NOW Camera - Align to the target
+        //  keep target in the center box, shift own
+        //  position only when target moves away
+        //  if target moves away for > 3 sec - aim on it when it stoped
+      break;
+      case CameraAction.flyTo:
+        if(time < _currentTimeLeft){
+          x += (_currentFlythroughTarget.x - x)*time / _currentTimeLeft;
+          y += (_currentFlythroughTarget.y - y)*time / _currentTimeLeft;
+          _currentTimeLeft -= time;
+        }
+        else{
+          x = _currentFlythroughTarget.x;
+          y = _currentFlythroughTarget.y;
+          _currentAction = CameraAction.stareAt;
+          _currentTimeLeft = _currentFlythroughTarget.stayTimeSec;
+        }
+        break;
+      case CameraAction.stareAt:
+        _currentTimeLeft -= time;
+        if(_currentTimeLeft < 0.0)
+          pullNextFlythroughTarget();
+        break;
+    }
   }
 
   Rect getVisibleRect() {
@@ -55,23 +89,24 @@ class WalkingCamera {
     return Rect.fromLTWH(visibleLeft, visibleTop, visibleWidth, visibleHeight);
   }
 
-  /*
-
-     sceneWidth  * zoom * widthZoomFactor       screenProportions.width
-    ---------------------------------------  = --------------------------
-     sceneHeight * zoom * heightZoomFactor      screenProportions.height 
-
-    
-    widthZoomFactor = 1.0 =>
-
-                        sceneWidth      screenProportions.height
-    heightZoomFactor = ------------- * --------------------------
-                        sceneHeight     screenProportions.width
-
-  */
-
   void updateZoomFactors() {
     if (this.screenProportions == null) return;
+
+    /*
+
+       sceneWidth  * zoom * widthZoomFactor       screenProportions.width
+      ---------------------------------------  = --------------------------
+       sceneHeight * zoom * heightZoomFactor      screenProportions.height 
+
+      
+      widthZoomFactor = 1.0 =>
+
+                          sceneWidth      screenProportions.height
+      heightZoomFactor = ------------- * --------------------------
+                          sceneHeight     screenProportions.width
+
+    */
+
     widthZoomFactor = 1.0;
     heightZoomFactor = (sceneWidth / sceneHeight) *
         (screenProportions.height / screenProportions.width);
@@ -82,6 +117,21 @@ class WalkingCamera {
   }
 
   void flyThrough(List<CameraFlythroughStep> targets){
-    //NOW 
+    flythroughTargets.addAll(targets);
+    pullNextFlythroughTarget();
+  }
+
+  void pullNextFlythroughTarget(){
+    if(flythroughTargets.length == 0){
+      _currentFlythroughTarget = null;
+      _currentAction = CameraAction.none;
+      _currentTimeLeft = 0.0;
+      isInAction = false;
+      return;
+    }
+    _currentFlythroughTarget = flythroughTargets.removeFirst();
+    _currentAction = CameraAction.flyTo;
+    _currentTimeLeft = _currentFlythroughTarget.flyTimeSec;
+    isInAction = true;
   }
 }
