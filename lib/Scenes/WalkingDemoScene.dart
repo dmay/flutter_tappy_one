@@ -51,7 +51,7 @@ class WalkingDemoScene extends SceneBase {
     this.camera = WalkingCamera(
       sceneWidth:  (this.map.tileWidth * this.map.layers[0].width).toDouble(),
       sceneHeight: (this.map.tileHeight * this.map.layers[0].height).toDouble(),
-      zoom: 0.1,
+      zoom: 0.25,
       x: this.player.x,
       y: this.player.y,
       screenProportions: screenSize,
@@ -106,11 +106,11 @@ class WalkingDemoScene extends SceneBase {
     final rowFrom = (visibleRect.top / map.tileHeight).floor();
     final rowTo = (visibleRect.bottom / map.tileHeight).ceil() -1;
     final screenRowHeight = screenSize.height * map.tileHeight / visibleRect.height;
-    final rowScreenShift = visibleRect.top % map.tileHeight == 0 ? 0 : ((map.tileHeight - visibleRect.top % map.tileHeight)/ map.tileHeight) * screenRowHeight;
+    final rowScreenShift = visibleRect.top % map.tileHeight == 0 ? 0 : -((visibleRect.top % map.tileHeight)/ map.tileHeight) * screenRowHeight;
     final columnFrom = (visibleRect.left / map.tileWidth).floor();
     final columnTo = (visibleRect.right / map.tileWidth).ceil() -1;
     final screenColumnWidth = screenSize.width * map.tileWidth / visibleRect.width;
-    final columnScreenShift = visibleRect.left % map.tileWidth == 0 ? 0 : ((map.tileWidth - visibleRect.left % map.tileWidth)/ map.tileWidth) * screenColumnWidth;
+    final columnScreenShift = visibleRect.left % map.tileWidth == 0 ? 0 : -((visibleRect.left % map.tileWidth)/ map.tileWidth) * screenColumnWidth;
     final fullPaint = BasicPalette.white.paint;
     for (var layerIndex = 0; layerIndex < map.layers.length; layerIndex++) {
       final layer = map.layers[layerIndex];
