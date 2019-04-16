@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flame/palette.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:tappy_one/SceneElements/CameraFlythroughStep.dart';
 import 'package:tappy_one/SceneElements/WalkingCamera.dart';
 import 'package:tappy_one/SceneElements/WalkingPlayer.dart';
 import 'package:tappy_one/Scenes/SceneBase.dart';
@@ -67,9 +68,9 @@ class WalkingDemoScene extends SceneBase {
       screenProportions: screenSize,
     );
 
-    // (9)  Camera.FlyTo target
-    // final targets = ListTargets(this.map);
-    // this.camera.flyThrough(targets);
+    // Camera.FlyTo target
+    final targets = listTargets();
+    this.camera.flyThrough(targets);
   }
 
   @override
@@ -170,5 +171,26 @@ class WalkingDemoScene extends SceneBase {
       spawn.x + spawn.width/2,
       spawn.y - spawn.height/2
     ];
+  }
+
+  List<CameraFlythroughStep> listTargets(){
+    final targets = 
+      objects
+      .where((o)=>
+        o.properties.containsKey('ShowOnStart') && 
+        o.properties['ShowOnStart']=='true')
+      .toList()
+      ..sort((a,b)=>int.parse(a.properties['ShowOnStartOrder']).compareTo(
+        int.parse(b.properties['ShowOnStartOrder'])
+      ));
+      final result = List<CameraFlythroughStep>();
+      result.add(CameraFlythroughStep(x:player.x, y:player.y, stayTimeSec: 0.5));
+      result.addAll(targets.map((t)=>CameraFlythroughStep(
+        flyTimeSec: 1.0,
+        x: t.x + t.width/2,
+        y: t.y - t.height/2,
+        stayTimeSec: 0.5,
+      )));
+      return result;
   }
 }

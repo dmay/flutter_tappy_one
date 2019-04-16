@@ -17,19 +17,21 @@
   </data>
  </layer>
  <objectgroup id="5" name="Objects">
-  <object id="4" type="Exit" gid="926" x="480" y="1024" width="96" height="32">
+  <object id="4" name="Exit to the village" type="Exit" gid="926" x="480" y="1024" width="96" height="32">
    <properties>
     <property name="ExitLocationId" value="VillageNorth"/>
     <property name="ShowOnStart" type="bool" value="true"/>
+    <property name="ShowOnStartOrder" type="int" value="1"/>
    </properties>
   </object>
-  <object id="5" type="Exit" gid="926" x="992" y="864" width="32" height="96">
+  <object id="5" name="Exit to dark forest" type="Exit" gid="926" x="992" y="864" width="32" height="96">
    <properties>
     <property name="ExitLocationId" value="DarkForest"/>
     <property name="ShowOnStart" type="bool" value="true"/>
+    <property name="ShowOnStartOrder" type="int" value="2"/>
    </properties>
   </object>
-  <object id="6" type="Spawn" gid="926" x="512" y="288" width="32" height="32"/>
+  <object id="6" name="Spawn" type="Spawn" gid="926" x="512" y="288" width="32" height="32"/>
  </objectgroup>
  <layer id="3" name="Pass" width="32" height="32">
   <data encoding="base64">

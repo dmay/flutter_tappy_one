@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:meta/meta.dart';
+import 'package:tappy_one/SceneElements/CameraFlythroughStep.dart';
 
 class WalkingCamera {
   double sceneWidth;
@@ -78,5 +79,9 @@ class WalkingCamera {
       widthZoomFactor = 1 / heightZoomFactor;
       heightZoomFactor = 1.0;
     }
+  }
+
+  void flyThrough(List<CameraFlythroughStep> targets){
+    //NOW 
   }
 }
