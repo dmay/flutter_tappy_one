@@ -23,8 +23,13 @@ class WalkingDemoScene extends SceneBase {
   static const num tilesetTileHeight = 32.0;
   static const int SpawnTileId = 926;
 
+  static const bool __debug_show_grid = false;
+
   Tiled.TileMap map;
   Image tilesetImage;
+  List<Tiled.TmxObject> objects;
+  Tiled.Layer passLayer;
+
   WalkingPlayer player;
   WalkingCamera camera;
 
@@ -37,14 +42,19 @@ class WalkingDemoScene extends SceneBase {
     final mapXml = await Flame.assets.readFile(mapFileName());
     this.map = Tiled.TileMapParser().parse(mapXml);
     this.tilesetImage = await Flame.images.load(tilesetFileName());
+    this.objects = map.objectGroups.expand((g)=>g.tmxObjects).toList();
+    this.passLayer = map
+        .layers
+        .firstWhere((l) => l.name.toUpperCase() == 'PASS', orElse: () => null);
+    if (passLayer == null) throw Exception('Map does not have "Pass" layer');
 
     // (16) Spawn actors
 
     // Spawn player
     var playerSpawn = locatePlayerOnSpawn(this.map, SpawnTileId);
     this.player = WalkingPlayer(
-      playerSpawn[0]*this.map.tileWidth  + this.map.tileWidth/2, 
-      playerSpawn[1]*this.map.tileHeight + this.map.tileHeight/2
+      playerSpawn[0], 
+      playerSpawn[1]
       );
 
     // Position camera
@@ -112,6 +122,7 @@ class WalkingDemoScene extends SceneBase {
     final screenColumnWidth = screenSize.width * map.tileWidth / visibleRect.width;
     final columnScreenShift = visibleRect.left % map.tileWidth == 0 ? 0 : -((visibleRect.left % map.tileWidth)/ map.tileWidth) * screenColumnWidth;
     final fullPaint = BasicPalette.white.paint;
+    final gridPaint = Paint()..color = Color(0xFF000000)..style = PaintingStyle.stroke;
     for (var layerIndex = 0; layerIndex < map.layers.length; layerIndex++) {
       final layer = map.layers[layerIndex];
       if(layer.name.toUpperCase() == 'PASS') continue;
@@ -129,6 +140,8 @@ class WalkingDemoScene extends SceneBase {
             screenX, screenY, 
             screenColumnWidth, screenRowHeight);
           canvas.drawImageRect(tilesetImage, tilesetPosition, screenPosition, fullPaint);
+          if(__debug_show_grid)
+            canvas.drawRect(screenPosition, gridPaint);
         }
     }    
   }
@@ -148,19 +161,14 @@ class WalkingDemoScene extends SceneBase {
       targetY: player.y);
   }
 
-  static List locatePlayerOnSpawn(Tiled.TileMap map, int spawnTileId) {
-    final passLayer = map
-        .layers
-        .firstWhere((l) => l.name.toUpperCase() == 'PASS', orElse: () => null);
-    if (passLayer == null) throw Exception('Map does not have "Pass" layer');
-    for (var row = 0; row < passLayer.tileMatrix.length; row++) {
-      final column = passLayer.tileMatrix[row].indexOf(spawnTileId);
-      if (column >= 0) {
-        final x = column;
-        final y = row;
-        return [x, y];
-      }
-    }
-    throw Exception('Map does not have Spawn tile #$spawnTileId in "Pass" layer');
+  List locatePlayerOnSpawn(Tiled.TileMap map, int spawnTileId) {
+    final spawn = this.objects.firstWhere(
+      (o)=>o.type == 'Spawn', 
+      orElse: () => throw Exception('Map does not have "Spawn" object')
+      );
+    return [
+      spawn.x + spawn.width/2,
+      spawn.y - spawn.height/2
+    ];
   }
 }

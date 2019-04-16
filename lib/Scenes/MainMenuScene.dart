@@ -53,7 +53,7 @@ class MainMenuScene extends SceneBase {
   Function goToPlay;
   Function openSettings;
 
-  MainMenuScene(this.goToPlay, this.openSettings){}
+  MainMenuScene(this.goToPlay, this.openSettings);
 
   @override
   void resize(Size size) {
