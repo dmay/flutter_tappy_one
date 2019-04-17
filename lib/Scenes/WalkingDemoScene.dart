@@ -3,6 +3,7 @@ import 'package:flame/palette.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:tappy_one/SceneElements/CameraFlythroughStep.dart';
+import 'package:tappy_one/SceneElements/FpsCounter.dart';
 import 'package:tappy_one/SceneElements/WalkingCamera.dart';
 import 'package:tappy_one/SceneElements/WalkingPlayer.dart';
 import 'package:tappy_one/Scenes/SceneBase.dart';
@@ -25,6 +26,7 @@ class WalkingDemoScene extends SceneBase {
   static const int SpawnTileId = 926;
 
   static const bool __debug_show_grid = false;
+  static const bool __debug_show_fps  = true;
 
   Tiled.TileMap map;
   Image tilesetImage;
@@ -33,6 +35,7 @@ class WalkingDemoScene extends SceneBase {
 
   WalkingPlayer player;
   WalkingCamera camera;
+  FpsCounter fpsCounter;
 
   // State information
   Rect lastVisibleRect;  
@@ -71,20 +74,26 @@ class WalkingDemoScene extends SceneBase {
     // Camera.FlyTo target
     final targets = listTargets();
     this.camera.flyThrough(targets);
+
+    if(__debug_show_fps){
+      fpsCounter = FpsCounter();
+      fpsCounter.resize(screenSize);
+    }
   }
 
   @override
   void resize(Size size){
     super.resize(size);
     this.camera?.resize(size);
+    this.fpsCounter?.resize(size);
   }
 
   @override
   void onTapDown(TapDownDetails d) {
-    goToMainMenu();
-
     // Check if interaction enabled
     if(this.camera.isInAction) return;
+
+    this.switchSceneTo(goToMainMenu);
 
     // (11) Detect target
 
@@ -97,6 +106,7 @@ class WalkingDemoScene extends SceneBase {
 
   @override
   void render(Canvas canvas) {
+    super.render(canvas);
     if(screenSize == null) return;
 
     final visibleRect = this.camera.getVisibleRect();
@@ -110,7 +120,8 @@ class WalkingDemoScene extends SceneBase {
 
     // (14) HUD
 
-    // (9) FPS rate
+    // FPS rate
+    fpsCounter?.render(canvas);
   }
 
   void renderMap(Canvas canvas, Rect visibleRect) {
@@ -160,6 +171,8 @@ class WalkingDemoScene extends SceneBase {
       time:time, 
       targetX: player.x, 
       targetY: player.y);
+
+      fpsCounter?.update(time);
   }
 
   List locatePlayerOnSpawn(Tiled.TileMap map, int spawnTileId) {
