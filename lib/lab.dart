@@ -1,7 +1,14 @@
 import 'dart:io';
 import 'package:tiled/tiled.dart';
+import 'dart:async';
 
-void  main() async {
+void main() async{
+  final c = Completer();
+  //c.
+}
+
+
+void  mapTiled() async {
     final mapXml = await File('assets/WalkingDemoScene.tmx').readAsString();
     final map = TileMapParser().parse(mapXml);
     //print(map.layers[3].name);

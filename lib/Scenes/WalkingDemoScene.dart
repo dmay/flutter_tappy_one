@@ -23,7 +23,6 @@ class WalkingDemoScene extends SceneBase {
   static const num tilesetHeight = 32;
   static const num tilesetTileWidth = 32.0;
   static const num tilesetTileHeight = 32.0;
-  static const int SpawnTileId = 926;
 
   static const bool __debug_show_grid = false;
   static const bool __debug_show_fps  = true;
@@ -34,6 +33,7 @@ class WalkingDemoScene extends SceneBase {
   Tiled.Layer passLayer;
 
   WalkingPlayer player;
+  Image playerImage;
   WalkingCamera camera;
   FpsCounter fpsCounter;
 
@@ -55,7 +55,8 @@ class WalkingDemoScene extends SceneBase {
     // (16) Spawn actors
 
     // Spawn player
-    var playerSpawn = locatePlayerOnSpawn(this.map, SpawnTileId);
+    //this.playerImage = await Flame.images.load(playerImageFileName());
+    final playerSpawn = locatePlayerOnSpawn(this.map);
     this.player = WalkingPlayer(
       playerSpawn[0], 
       playerSpawn[1]
@@ -116,7 +117,8 @@ class WalkingDemoScene extends SceneBase {
 
     // (17) Visible actors
 
-    // (10) Player
+    // Player
+    this.player.render(canvas, visibleRect);
 
     // (14) HUD
 
@@ -175,7 +177,7 @@ class WalkingDemoScene extends SceneBase {
       fpsCounter?.update(time);
   }
 
-  List locatePlayerOnSpawn(Tiled.TileMap map, int spawnTileId) {
+  List locatePlayerOnSpawn(Tiled.TileMap map) {
     final spawn = this.objects.firstWhere(
       (o)=>o.type == 'Spawn', 
       orElse: () => throw Exception('Map does not have "Spawn" object')
