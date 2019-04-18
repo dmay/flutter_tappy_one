@@ -79,9 +79,9 @@ class MainLoop extends Game{
     final SceneBase scene = buildScene();
     if(scene == null)
       throw Exception('scene builder delegate returned null');
+    await scene.initialize();
     if(screenSize != null)
       scene.resize(screenSize);
-    await scene.initialize();
     scene.switchSceneTo = this.switchSceneTo;
     scene.openScene = this.openScene;
     scene.closeScene = () => this.closeScene(scene);

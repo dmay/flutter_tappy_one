@@ -85,6 +85,7 @@ class WalkingDemoScene extends SceneBase {
   @override
   void resize(Size size){
     super.resize(size);
+    this.player?.resize(size);
     this.camera?.resize(size);
     this.fpsCounter?.resize(size);
   }
