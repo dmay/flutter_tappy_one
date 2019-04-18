@@ -38,7 +38,8 @@ class WalkingDemoScene extends SceneBase {
   FpsCounter fpsCounter;
 
   // State information
-  Rect lastVisibleRect;  
+  bool isInScript = false;
+  Rect lastVisibleRect;
 
   @override
   Future initialize() async {
@@ -92,7 +93,7 @@ class WalkingDemoScene extends SceneBase {
   @override
   void onTapDown(TapDownDetails d) {
     // Check if interaction enabled
-    if(this.camera.isInAction) return;
+    if(this.isInScript || this.camera.isInAction) return;
 
     this.switchSceneTo(goToMainMenu);
 
@@ -168,6 +169,8 @@ class WalkingDemoScene extends SceneBase {
     // Player: going
     player.update(time);
 
+    // (13) Player: verify if walked into triggers
+
     // (20) Actors: update
     
     // Camera: fly OR adjust to player
@@ -213,15 +216,14 @@ class WalkingDemoScene extends SceneBase {
   }
 
   void script01_Overview() async {
-    // Camera.FlyTo target
-    final targets = listTargets();
-    for(var target in targets)
-      await camera.flyThrough(target);
+    isInScript = true;
+    // final targets = listTargets();
+    // for(var target in targets)
+    //   await camera.flyThrough(target);
     await player.walkTo(player.x - 60, player.y+30);
     await player.walkTo(player.x + 60, player.y+30);
     await player.walkTo(player.x + 60, player.y-30);
     await player.walkTo(player.x - 60, player.y-30);
-    //this.camera.flyThrough(targets);
-
+    isInScript = false;
   }
 }

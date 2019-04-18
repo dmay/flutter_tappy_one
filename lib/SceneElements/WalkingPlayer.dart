@@ -45,7 +45,7 @@ class WalkingPlayer{
 
   void render(Canvas canvas, Rect visibleRect) {
     if(screenSize == null) return;
-    // NOW player.render
+    // NOW (02) player.render with real sprites and animation
 
     final screenX = screenSize.width * (this.x-visibleRect.left)/visibleRect.width;
     final screenY = screenSize.height * (this.y-visibleRect.top)/visibleRect.height;

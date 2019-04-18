@@ -44,7 +44,7 @@ class WalkingCamera {
   void update({@required double time, double targetX, double targetY}) {
     switch(_currentAction){
       case CameraAction.none:
-        //NOW Camera - Align to the target
+        //NOW (01) Camera - Align to the target
         //  keep target in the center box, shift own
         //  position only when target moves away
         //  if target moves away for > 3 sec - aim on it when it stoped
