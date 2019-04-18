@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:ui';
 import 'package:meta/meta.dart';
@@ -20,9 +21,10 @@ class WalkingCamera {
   bool isInAction;
   Size screenProportions;
 
-  Queue<CameraFlythroughStep> flythroughTargets = Queue<CameraFlythroughStep>();
+  //Queue<CameraFlythroughStep> flythroughTargets = Queue<CameraFlythroughStep>();
   CameraFlythroughStep _currentFlythroughTarget;
   CameraAction _currentAction = CameraAction.none;
+  Completer _currentActionCompleter;
   num _currentTimeLeft = 0.0;
 
   WalkingCamera(
@@ -65,7 +67,7 @@ class WalkingCamera {
       case CameraAction.stareAt:
         _currentTimeLeft -= time;
         if(_currentTimeLeft < 0.0)
-          pullNextFlythroughTarget();
+          completeCurrentAction();
         break;
     }
   }
@@ -116,22 +118,23 @@ class WalkingCamera {
     }
   }
 
-  void flyThrough(List<CameraFlythroughStep> targets){
-    flythroughTargets.addAll(targets);
-    pullNextFlythroughTarget();
-  }
-
-  void pullNextFlythroughTarget(){
-    if(flythroughTargets.length == 0){
-      _currentFlythroughTarget = null;
-      _currentAction = CameraAction.none;
-      _currentTimeLeft = 0.0;
-      isInAction = false;
-      return;
-    }
-    _currentFlythroughTarget = flythroughTargets.removeFirst();
+  Future flyThrough(CameraFlythroughStep target){
+    completeCurrentAction();
     _currentAction = CameraAction.flyTo;
+    _currentFlythroughTarget = target;
     _currentTimeLeft = _currentFlythroughTarget.flyTimeSec;
     isInAction = true;
+    _currentActionCompleter = Completer();
+    return _currentActionCompleter.future;
+  }
+
+  void completeCurrentAction(){
+    if(_currentActionCompleter!=null && !_currentActionCompleter.isCompleted)
+      _currentActionCompleter.complete();
+    _currentAction = CameraAction.none;
+    _currentFlythroughTarget = null;
+    _currentTimeLeft = null;
+    isInAction = false;
+    _currentActionCompleter = null;
   }
 }

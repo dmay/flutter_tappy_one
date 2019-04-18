@@ -72,14 +72,12 @@ class WalkingDemoScene extends SceneBase {
       screenProportions: screenSize,
     );
 
-    // Camera.FlyTo target
-    final targets = listTargets();
-    this.camera.flyThrough(targets);
-
     if(__debug_show_fps){
       fpsCounter = FpsCounter();
       fpsCounter.resize(screenSize);
     }
+
+    script01_Overview();
   }
 
   @override
@@ -209,5 +207,14 @@ class WalkingDemoScene extends SceneBase {
       )));
       result.add(CameraFlythroughStep(flyTimeSec: 1.0, x:player.x, y:player.y, stayTimeSec: 0.5));
       return result;
+  }
+
+  void script01_Overview() async {
+    // Camera.FlyTo target
+    final targets = listTargets();
+    for(var target in targets)
+      await camera.flyThrough(target);
+    //this.camera.flyThrough(targets);
+
   }
 }
