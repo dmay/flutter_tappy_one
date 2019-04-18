@@ -58,8 +58,9 @@ class WalkingDemoScene extends SceneBase {
     //this.playerImage = await Flame.images.load(playerImageFileName());
     final playerSpawn = locatePlayerOnSpawn(this.map);
     this.player = WalkingPlayer(
-      playerSpawn[0], 
-      playerSpawn[1]
+      x: playerSpawn[0], 
+      y: playerSpawn[1],
+      speed: 64,
       );
 
     // Position camera
@@ -164,7 +165,9 @@ class WalkingDemoScene extends SceneBase {
     super.update(time);
     if(!isActive) return;
 
-    // (13) Player: going
+    // Player: going
+    player.update(time);
+
     // (20) Actors: update
     
     // Camera: fly OR adjust to player
@@ -214,6 +217,10 @@ class WalkingDemoScene extends SceneBase {
     final targets = listTargets();
     for(var target in targets)
       await camera.flyThrough(target);
+    await player.walkTo(player.x - 60, player.y+30);
+    await player.walkTo(player.x + 60, player.y+30);
+    await player.walkTo(player.x + 60, player.y-30);
+    await player.walkTo(player.x - 60, player.y-30);
     //this.camera.flyThrough(targets);
 
   }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:ui';
 import 'package:meta/meta.dart';
 import 'package:tappy_one/SceneElements/CameraFlythroughStep.dart';
@@ -21,7 +20,6 @@ class WalkingCamera {
   bool isInAction;
   Size screenProportions;
 
-  //Queue<CameraFlythroughStep> flythroughTargets = Queue<CameraFlythroughStep>();
   CameraFlythroughStep _currentFlythroughTarget;
   CameraAction _currentAction = CameraAction.none;
   Completer _currentActionCompleter;
