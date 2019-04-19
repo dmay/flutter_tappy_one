@@ -73,6 +73,7 @@ class WalkingDemoScene extends SceneBase {
       x: this.player.x,
       y: this.player.y,
       screenProportions: screenSize,
+      walkingSection: 1/2,
     );
 
     if(__debug_show_fps){
@@ -96,12 +97,15 @@ class WalkingDemoScene extends SceneBase {
     // Check if interaction enabled
     if(this.isInScript || this.camera.isInAction) return;
 
-    this.switchSceneTo(goToMainMenu);
+    //this.switchSceneTo(goToMainMenu);
+    final mapX = d.globalPosition.dx * lastVisibleRect.width / screenSize.width + lastVisibleRect.left;
+    final mapY = d.globalPosition.dy * lastVisibleRect.height / screenSize.height + lastVisibleRect.top;
 
     // (11) Detect target
 
     // (15) If HUD: react
     // (12) If target is floor: go to
+    player.walkTo(mapX, mapY);
     //      If target is actor:
     // (18)   If actor is too far away: go to
     // (19)   else: act
