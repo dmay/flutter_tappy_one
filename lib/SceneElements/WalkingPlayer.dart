@@ -26,7 +26,6 @@ class WalkingPlayer{
         // Do nothing
         break;
       case PlayerAction.walkTo:
-        // TODO: Handle this case.
         final walked = speed * time;
         final path = Offset(_currentWalkToTarget.dx-x, _currentWalkToTarget.dy-y);
         final distance = path.distance;

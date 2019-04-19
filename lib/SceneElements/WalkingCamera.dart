@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:tappy_one/SceneElements/CameraFlythroughStep.dart';
 
@@ -13,17 +15,24 @@ class WalkingCamera {
   double sceneWidth;
   double sceneHeight;
   double zoom;
+  double walkingSection;
   double widthZoomFactor;
   double heightZoomFactor;
   double x;
   double y;
-  bool isInAction;
+  bool isInAction = false;
   Size screenProportions;
+  double visibleWidth;
+  double visibleHeight;
+  Rect visibleRectangle;
 
   CameraFlythroughStep _currentFlythroughTarget;
   CameraAction _currentAction = CameraAction.none;
   Completer _currentActionCompleter;
   num _currentTimeLeft = 0.0;
+
+  double maxDistanceToTarget;
+
 
   WalkingCamera(
       {@required this.sceneWidth,
@@ -31,23 +40,27 @@ class WalkingCamera {
       this.zoom = 1.0,
       this.x = 0.0,
       this.y = 0.0,
-      this.isInAction = false,
-      this.screenProportions}) {
-    updateZoomFactors();
+      this.screenProportions,
+      this.walkingSection = 2/3,
+      }) {
+    updateFactors();
   }
 
   void resize(Size size) {
     screenProportions = size;
-    updateZoomFactors();
+    updateFactors();
   }
 
   void update({@required double time, double targetX, double targetY}) {
     switch(_currentAction){
       case CameraAction.none:
-        //NOW (01) Camera - Align to the target
-        //  keep target in the center box, shift own
-        //  position only when target moves away
-        //  if target moves away for > 3 sec - aim on it when it stoped
+        final dx = x - targetX;
+        final dy = y - targetY;
+        if(dx > maxDistanceToTarget) x = targetX +maxDistanceToTarget;
+        else if(dx < -maxDistanceToTarget) x = targetX -maxDistanceToTarget;
+        if(dy > maxDistanceToTarget) y = targetY +maxDistanceToTarget;
+        else if(dy < -maxDistanceToTarget) y = targetY -maxDistanceToTarget;
+        //TODO Camera: if target moves away for > 3 sec - aim on it when it stoped
       break;
       case CameraAction.flyTo:
         if(time < _currentTimeLeft){
@@ -65,15 +78,13 @@ class WalkingCamera {
       case CameraAction.stareAt:
         _currentTimeLeft -= time;
         if(_currentTimeLeft < 0.0)
-          completeCurrentAction();
+          _completeCurrentAction();
         break;
     }
+    visibleRectangle = _updateVisibleRectangle();
   }
 
-  Rect getVisibleRect() {
-    final visibleWidth = sceneWidth * zoom * widthZoomFactor;
-    final visibleHeight = sceneHeight * zoom * heightZoomFactor;
-
+  Rect _updateVisibleRectangle() {
     var visibleTop = y - visibleHeight / 2;
     if (visibleTop < 0.0)
       visibleTop = 0.0;
@@ -89,9 +100,21 @@ class WalkingCamera {
     return Rect.fromLTWH(visibleLeft, visibleTop, visibleWidth, visibleHeight);
   }
 
-  void updateZoomFactors() {
+  void updateFactors(){
     if (this.screenProportions == null) return;
 
+    _updateZoomFactors();
+    
+    this.visibleWidth = sceneWidth * zoom * widthZoomFactor;
+    this.visibleHeight = sceneHeight * zoom * heightZoomFactor;
+    
+    this.maxDistanceToTarget = min(
+      visibleWidth * walkingSection,
+      visibleHeight * walkingSection
+    ) / 2;
+  }
+
+  void _updateZoomFactors() {
     /*
 
        sceneWidth  * zoom * widthZoomFactor       screenProportions.width
@@ -117,7 +140,7 @@ class WalkingCamera {
   }
 
   Future flyThrough(CameraFlythroughStep target){
-    completeCurrentAction();
+    _completeCurrentAction();
     _currentAction = CameraAction.flyTo;
     _currentFlythroughTarget = target;
     _currentTimeLeft = _currentFlythroughTarget.flyTimeSec;
@@ -126,7 +149,7 @@ class WalkingCamera {
     return _currentActionCompleter.future;
   }
 
-  void completeCurrentAction(){
+  void _completeCurrentAction(){
     if(_currentActionCompleter!=null && !_currentActionCompleter.isCompleted)
       _currentActionCompleter.complete();
     _currentAction = CameraAction.none;

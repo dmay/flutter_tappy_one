@@ -26,6 +26,7 @@ class WalkingDemoScene extends SceneBase {
 
   static const bool __debug_show_grid = false;
   static const bool __debug_show_fps  = true;
+  static const bool __debug_show_camera = true;
 
   Tiled.TileMap map;
   Image tilesetImage;
@@ -107,11 +108,33 @@ class WalkingDemoScene extends SceneBase {
   }
 
   @override
+  void update(double time) {
+    super.update(time);
+    if(!isActive) return;
+
+    // Player: going
+    player.update(time);
+
+    // (13) Player: verify if walked into triggers
+
+    // (20) Actors: update
+    
+    // Camera: fly OR adjust to player
+    this.camera.update(
+      time:time, 
+      targetX: player.x, 
+      targetY: player.y);
+
+      fpsCounter?.update(time);
+  }  
+
+  @override
   void render(Canvas canvas) {
     super.render(canvas);
     if(screenSize == null) return;
 
-    final visibleRect = this.camera.getVisibleRect();
+    final visibleRect = this.camera.visibleRectangle;
+    if(visibleRect == null) return;
     this.lastVisibleRect = visibleRect;
 
     renderMap(canvas, visibleRect);
@@ -125,6 +148,8 @@ class WalkingDemoScene extends SceneBase {
 
     // FPS rate
     fpsCounter?.render(canvas);
+
+    if(__debug_show_camera) renderCamera(canvas, visibleRect);
   }
 
   void renderMap(Canvas canvas, Rect visibleRect) {
@@ -161,25 +186,29 @@ class WalkingDemoScene extends SceneBase {
     }    
   }
 
-  @override
-  void update(double time) {
-    super.update(time);
-    if(!isActive) return;
-
-    // Player: going
-    player.update(time);
-
-    // (13) Player: verify if walked into triggers
-
-    // (20) Actors: update
+  void renderCamera(Canvas canvas, Rect visibleRect){
+    final screenX = screenSize.width * (camera.x-visibleRect.left)/visibleRect.width;
+    final screenY = screenSize.height * (camera.y-visibleRect.top)/visibleRect.height;
+    final walkingAreaSize = camera.maxDistanceToTarget * screenSize.width / visibleRect.width;
+    final size = 10;
     
-    // Camera: fly OR adjust to player
-    this.camera.update(
-      time:time, 
-      targetX: player.x, 
-      targetY: player.y);
+    final cameraPaint = Paint()
+      ..color = Color(0xFFDE1FCC)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    
+    canvas.restore();
+    
+    // Crosshair
+    canvas.drawLine(Offset(screenX, screenY - size), Offset(screenX, screenY + size), cameraPaint);
+    canvas.drawLine(Offset(screenX - size, screenY), Offset(screenX + size, screenY), cameraPaint);
+    
+    // Box
+    canvas.drawLine(Offset(screenX + walkingAreaSize, screenY + walkingAreaSize), Offset(screenX + walkingAreaSize, screenY - walkingAreaSize), cameraPaint);
+    canvas.drawLine(Offset(screenX + walkingAreaSize, screenY + walkingAreaSize), Offset(screenX - walkingAreaSize, screenY + walkingAreaSize), cameraPaint);
+    canvas.drawLine(Offset(screenX - walkingAreaSize, screenY - walkingAreaSize), Offset(screenX + walkingAreaSize, screenY - walkingAreaSize), cameraPaint);
+    canvas.drawLine(Offset(screenX - walkingAreaSize, screenY - walkingAreaSize), Offset(screenX - walkingAreaSize, screenY + walkingAreaSize), cameraPaint);
 
-      fpsCounter?.update(time);
   }
 
   List locatePlayerOnSpawn(Tiled.TileMap map) {
