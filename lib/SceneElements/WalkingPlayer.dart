@@ -1,18 +1,56 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:flame/animation.dart';
+import 'package:flame/flame.dart';
 
 enum PlayerAction{
   none,
   walkTo,
 }
 
+enum PlayerLookingDirection{
+  up, down,
+  left, right,
+}
+
 class WalkingPlayer{
   
+  static const String spriteSheetFile = 'player.png';
+
   double x;
   double y;
   double speed;
 
+  Image spriteSheet;
+
+  Map animationsIdle;
+  Map animationsWalking;
+
+  PlayerLookingDirection _currentDirection;
+  Animation _currentAnimation;
+
   WalkingPlayer({this.x, this.y, this.speed = 64.0});
+  
+  Future initialize() async {
+    this.spriteSheet = await Flame.images.load(spriteSheetFile);
+    
+    this.animationsIdle = {
+      PlayerLookingDirection.up:    Animation.sequenced(spriteSheetFile, 1, textureWidth: 24, textureHeight: 32, textureX: 24, textureY:  0, stepTime: 0.2),
+      PlayerLookingDirection.right: Animation.sequenced(spriteSheetFile, 1, textureWidth: 24, textureHeight: 32, textureX: 24, textureY: 32, stepTime: 0.2),
+      PlayerLookingDirection.down:  Animation.sequenced(spriteSheetFile, 1, textureWidth: 24, textureHeight: 32, textureX: 24, textureY: 64, stepTime: 0.2),
+      PlayerLookingDirection.left:  Animation.sequenced(spriteSheetFile, 1, textureWidth: 24, textureHeight: 32, textureX: 24, textureY: 96, stepTime: 0.2),
+    };
+
+    this.animationsWalking = {
+      PlayerLookingDirection.up:    Animation.sequenced(spriteSheetFile, 3, textureWidth: 24, textureHeight: 32, textureX:  0, textureY:  0, stepTime: 0.2),
+      PlayerLookingDirection.right: Animation.sequenced(spriteSheetFile, 3, textureWidth: 24, textureHeight: 32, textureX:  0, textureY: 32, stepTime: 0.2),
+      PlayerLookingDirection.down:  Animation.sequenced(spriteSheetFile, 3, textureWidth: 24, textureHeight: 32, textureX:  0, textureY: 64, stepTime: 0.2),
+      PlayerLookingDirection.left:  Animation.sequenced(spriteSheetFile, 3, textureWidth: 24, textureHeight: 32, textureX:  0, textureY: 96, stepTime: 0.2),
+    };
+
+    this._currentDirection = PlayerLookingDirection.down;
+    this._currentAnimation = animationsIdle[_currentDirection];
+  }
 
   Size screenSize;
 
@@ -40,19 +78,31 @@ class WalkingPlayer{
         }
         break;
     }
+
+    _currentAnimation?.update(time);
   }
 
   void render(Canvas canvas, Rect visibleRect) {
     if(screenSize == null) return;
-    // NOW (02) player.render with real sprites and animation
+    final sprite = _currentAnimation?.getSprite();
+    if(sprite == null) return;
 
-    final screenX = screenSize.width * (this.x-visibleRect.left)/visibleRect.width;
-    final screenY = screenSize.height * (this.y-visibleRect.top)/visibleRect.height;
+    final factorX = screenSize.width  /visibleRect.width;
+    final factorY = screenSize.height /visibleRect.height;
+
+    final screenX = (this.x-visibleRect.left)* factorX;
+    final screenY = (this.y-visibleRect.top) * factorY;
+ 
+    final screenWidth = sprite.size.x * factorX;
+    final screenHeight = sprite.size.y * factorY;
+    canvas.translate(
+      screenX - screenWidth / 2,
+      screenY - screenHeight);
+    sprite.render(canvas, screenWidth, screenHeight);
     final markerPaint = Paint()
       ..color = Color(0xFFDE431F)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5;
-
     canvas.restore();
     canvas.drawCircle(Offset(screenX, screenY), 20, markerPaint);
     canvas.restore();
@@ -71,18 +121,30 @@ class WalkingPlayer{
     _currentWalkToTarget = Offset(targetX, targetY);
     _currentTimeLeft = null;
     isInAction = true;
-    _currentActionCompleter = Completer();
-    return _currentActionCompleter.future;    
-  }
-
-  void completeCurrentAction(){
-    if(_currentActionCompleter!=null && !_currentActionCompleter.isCompleted)
-      _currentActionCompleter.complete();
-    _currentAction = PlayerAction.none;
-    _currentWalkToTarget = null;
-    _currentTimeLeft = null;
-    isInAction = false;
-    _currentActionCompleter = null;
-  }  
+    _currentDirection = getDirection(this.x, this.y, targetX, targetY);
+        _currentAnimation = animationsWalking[_currentDirection];
+        _currentActionCompleter = Completer();
+        return _currentActionCompleter.future;    
+      }
+    
+      void completeCurrentAction(){
+        if(_currentActionCompleter!=null && !_currentActionCompleter.isCompleted)
+          _currentActionCompleter.complete();
+        _currentAction = PlayerAction.none;
+        _currentWalkToTarget = null;
+        _currentTimeLeft = null;
+        isInAction = false;
+        _currentAnimation = animationsIdle[_currentDirection];
+        _currentActionCompleter = null;
+      }
+    
+      static PlayerLookingDirection getDirection(double fromX, double fromY, num toX, num toY) {
+          final dx = toX - fromX;
+          final dy = toY - fromY;
+          if(dx > dy && dx >= -dy) return PlayerLookingDirection.right;
+          if(dx < dy && dx >= -dy) return PlayerLookingDirection.down;
+          if(dx < dy && dx <= -dy) return PlayerLookingDirection.left;
+          return PlayerLookingDirection.up;
+      }
   
 }

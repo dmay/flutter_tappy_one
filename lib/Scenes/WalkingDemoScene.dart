@@ -64,6 +64,7 @@ class WalkingDemoScene extends SceneBase {
       y: playerSpawn[1],
       speed: 64,
       );
+    await player.initialize();
 
     // Position camera
     this.camera = WalkingCamera(
