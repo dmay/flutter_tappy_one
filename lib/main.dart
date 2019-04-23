@@ -23,6 +23,9 @@ void  main() async {
 
   var tapRecognizer = TapGestureRecognizer();
   tapRecognizer.onTapDown = mainLoop.onTapDown;
+  tapRecognizer.onTap = mainLoop.onTap;
+  tapRecognizer.onTapUp = mainLoop.onTapUp;
+  tapRecognizer.onTapCancel = mainLoop.onTapCancel;
   var panRecognizer = PanGestureRecognizer();
   panRecognizer.onStart = mainLoop.onPanStart;
   panRecognizer.onUpdate = mainLoop.onPanUpdate;

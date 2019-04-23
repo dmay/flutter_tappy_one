@@ -1,8 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/gestures.dart';
 
-abstract class SceneBase{
-
+abstract class SceneBase {
   /* Control interfqace */
 
   Size screenSize;
@@ -10,15 +9,15 @@ abstract class SceneBase{
 
   Future initialize() {}
 
-  void setActive(){
+  void setActive() {
     this.isActive = true;
   }
 
-  void setInactive(){
+  void setInactive() {
     this.isActive = false;
   }
 
-  void destroy(){}
+  void destroy() {}
 
   /* Main loop methods */
 
@@ -36,26 +35,27 @@ abstract class SceneBase{
 
   void onTap(TapDownDetails details) {}
 
-  void onDoubleTap(TapDownDetails details) {}
+  void onTapUp(TapUpDetails details) {}
+  
+  void onTapCancel() {}
 
-  onPanStart(DragStartDetails details) {}
+  void onPanStart(DragStartDetails details) {}
 
   void onPanUpdate(DragUpdateDetails details) {}
 
   void onPanEnd(DragEndDetails details) {}
-  
+
   /*
       Scenes navigation. 
       Actual implementations assigned by MainLoop.buildAndSetupScene method
   */
 
-  Function switchSceneTo = (Function buildNextScene) 
-    => throw Exception('!!! [SceneBase] call to default switchSceneTo');
+  Function switchSceneTo = (Function buildNextScene) =>
+      throw Exception('!!! [SceneBase] call to default switchSceneTo');
 
-  Function openScene = (Function buildNewScene)
-    => throw Exception('!!! [SceneBase] call to default openScene');
+  Function openScene = (Function buildNewScene) =>
+      throw Exception('!!! [SceneBase] call to default openScene');
 
-  Function closeScene = ()
-    => throw Exception('!!! [SceneBase] call to default closeScene');
-
+  Function closeScene =
+      () => throw Exception('!!! [SceneBase] call to default closeScene');
 }

@@ -43,7 +43,9 @@ class MainLoop extends Game{
 
   void onTap() => activeScene?.onTap(_lastTapDownDetails); 
 
-  void onDoubleTap() => activeScene?.onDoubleTap(_lastTapDownDetails);
+  void onTapUp(TapUpDetails details) => activeScene?.onTapUp(details);
+
+  void onTapCancel() => activeScene?.onTapCancel();
 
   void onPanStart(DragStartDetails details) => activeScene?.onPanStart(details);
 
@@ -105,5 +107,4 @@ class MainLoop extends Game{
     scene.closeScene = () => this.closeScene(scene);
     return scene;
   }
-
 }
