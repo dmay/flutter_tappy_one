@@ -2,16 +2,13 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 
 abstract class SceneBase{
-  
+
+  /* Control interfqace */
+
   Size screenSize;
   bool isActive = false;
 
-  void resize(Size size) {
-    screenSize = size;
-  }
-
-  Future initialize() {
-  }
+  Future initialize() {}
 
   void setActive(){
     this.isActive = true;
@@ -21,19 +18,36 @@ abstract class SceneBase{
     this.isActive = false;
   }
 
-  void onTapDown(TapDownDetails d) {
+  void destroy(){}
+
+  /* Main loop methods */
+
+  void resize(Size size) {
+    screenSize = size;
   }
 
-  void render(Canvas canvas) {
-  }
+  void render(Canvas canvas) {}
 
-  void update(double time) {
-  }
+  void update(double time) {}
 
-  void destroy(){
-  }
+  /* Events handlers */
 
-  /* Scenes navigation */
+  void onTapDown(TapDownDetails details) {}
+
+  void onTap(TapDownDetails details) {}
+
+  void onDoubleTap(TapDownDetails details) {}
+
+  onPanStart(DragStartDetails details) {}
+
+  void onPanUpdate(DragUpdateDetails details) {}
+
+  void onPanEnd(DragEndDetails details) {}
+  
+  /*
+      Scenes navigation. 
+      Actual implementations assigned by MainLoop.buildAndSetupScene method
+  */
 
   Function switchSceneTo = (Function buildNextScene) 
     => throw Exception('!!! [SceneBase] call to default switchSceneTo');

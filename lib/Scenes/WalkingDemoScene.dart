@@ -57,7 +57,6 @@ class WalkingDemoScene extends SceneBase {
     // (16) Spawn actors
 
     // Spawn player
-    //this.playerImage = await Flame.images.load(playerImageFileName());
     final playerSpawn = locatePlayerOnSpawn(this.map);
     this.player = WalkingPlayer(
       x: playerSpawn[0], 
@@ -110,6 +109,19 @@ class WalkingDemoScene extends SceneBase {
     //      If target is actor:
     // (18)   If actor is too far away: go to
     // (19)   else: act
+  }
+
+  @override
+  void onPanUpdate(DragUpdateDetails details) {
+    super.onPanUpdate(details);
+
+    // Check if interaction enabled
+    if(this.isInScript || this.camera.isInAction) return;
+
+    final mapX = details.globalPosition.dx * lastVisibleRect.width / screenSize.width + lastVisibleRect.left;
+    final mapY = details.globalPosition.dy * lastVisibleRect.height / screenSize.height + lastVisibleRect.top;
+
+    player.walkTo(mapX, mapY);
   }
 
   @override
@@ -253,11 +265,11 @@ class WalkingDemoScene extends SceneBase {
     isInScript = true;
     // final targets = listTargets();
     // for(var target in targets)
-    //   await camera.flyThrough(target);
-    await player.walkTo(player.x - 60, player.y+30);
-    await player.walkTo(player.x + 60, player.y+30);
-    await player.walkTo(player.x + 60, player.y-30);
-    await player.walkTo(player.x - 60, player.y-30);
+    // //   await camera.flyThrough(target);
+    // await player.walkTo(player.x - 60, player.y+30);
+    // await player.walkTo(player.x + 60, player.y+30);
+    // await player.walkTo(player.x + 60, player.y-30);
+    // await player.walkTo(player.x - 60, player.y-30);
     isInScript = false;
   }
 }

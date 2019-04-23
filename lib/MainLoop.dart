@@ -15,15 +15,14 @@ class MainLoop extends Game{
     // Something something load game state? Or load it on first touch of actual game scene?
   }
 
+   /* Main methods */
+
   @override
   void resize(Size size) {
     super.resize(size);
     screenSize = size;
     activeScene?.resize(size);
   }
-
-  void onTapDown(TapDownDetails d) 
-    => activeScene?.onTapDown(d);
 
   @override
   void render(Canvas canvas)
@@ -32,6 +31,25 @@ class MainLoop extends Game{
   @override
   void update(double time)
     => activeScene?.update(time);
+
+  /* Events 'routing' */
+
+  TapDownDetails _lastTapDownDetails;
+
+  void onTapDown(TapDownDetails details) {
+    activeScene?.onTapDown(details);
+    _lastTapDownDetails = details;
+  }
+
+  void onTap() => activeScene?.onTap(_lastTapDownDetails); 
+
+  void onDoubleTap() => activeScene?.onDoubleTap(_lastTapDownDetails);
+
+  void onPanStart(DragStartDetails details) => activeScene?.onPanStart(details);
+
+  void onPanUpdate(DragUpdateDetails details) => activeScene?.onPanUpdate(details);
+
+  void onPanEnd(DragEndDetails details) => activeScene?.onPanEnd(details);
 
   /* Scenes navigation */
 
@@ -87,7 +105,5 @@ class MainLoop extends Game{
     scene.closeScene = () => this.closeScene(scene);
     return scene;
   }
-
-  
 
 }

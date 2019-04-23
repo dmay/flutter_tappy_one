@@ -23,9 +23,15 @@ void  main() async {
 
   var tapRecognizer = TapGestureRecognizer();
   tapRecognizer.onTapDown = mainLoop.onTapDown;
+  var panRecognizer = PanGestureRecognizer();
+  panRecognizer.onStart = mainLoop.onPanStart;
+  panRecognizer.onUpdate = mainLoop.onPanUpdate;
+  panRecognizer.onEnd = mainLoop.onPanEnd;
 
   runApp(mainLoop.widget);
 
   flameUtil.addGestureRecognizer(tapRecognizer);
+  flameUtil.addGestureRecognizer(panRecognizer);
+
 }
 
