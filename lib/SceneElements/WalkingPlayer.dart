@@ -166,6 +166,7 @@ class WalkingPlayer {
   void goTo(num targetX, num targetY) {
     completeCurrentAction();
     _currentAction = PlayerAction.walkTo;
+    //NOW When calculate walkToTarget - choose farthest point on the line which is available
     _currentWalkToTarget = Offset(targetX, targetY);
     _currentTimeLeft = null;
     isInAction = true;

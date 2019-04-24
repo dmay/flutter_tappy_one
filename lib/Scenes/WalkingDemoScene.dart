@@ -104,11 +104,6 @@ class WalkingDemoScene extends SceneBase {
     this.tapDown = true;
     this.tapPosition = details.globalPosition;
 
-    //this.switchSceneTo(goToMainMenu);
-    // final mapX = d.globalPosition.dx * lastVisibleRect.width / screenSize.width + lastVisibleRect.left;
-    // final mapY = d.globalPosition.dy * lastVisibleRect.height / screenSize.height + lastVisibleRect.top;
-
-    // player.walkTo(mapX, mapY);
     //      If target is actor:
     // (18)   If actor is too far away: go to
     // (19)   else: act
@@ -183,12 +178,14 @@ class WalkingDemoScene extends SceneBase {
     if (visibleRect == null) return;
     this.lastVisibleRect = visibleRect;
 
-    renderMap(canvas, visibleRect);
+    renderMap('Ground', canvas, visibleRect);
 
     // (17) Visible actors
 
     // Player
     this.player.render(canvas, visibleRect);
+
+    renderMap('Ceiling', canvas, visibleRect);
 
     // (14) HUD
 
@@ -198,7 +195,7 @@ class WalkingDemoScene extends SceneBase {
     if (__debug_show_camera) renderCamera(canvas, visibleRect);
   }
 
-  void renderMap(Canvas canvas, Rect visibleRect) {
+  void renderMap(String layerNamePrefix, Canvas canvas, Rect visibleRect) {
     final rowFrom = (visibleRect.top / map.tileHeight).floor();
     final rowTo = (visibleRect.bottom / map.tileHeight).ceil() - 1;
     final screenRowHeight =
@@ -221,7 +218,7 @@ class WalkingDemoScene extends SceneBase {
       ..style = PaintingStyle.stroke;
     for (var layerIndex = 0; layerIndex < map.layers.length; layerIndex++) {
       final layer = map.layers[layerIndex];
-      if (layer.name.toUpperCase() == 'PASS') continue;
+      if (!layer.name.startsWith(layerNamePrefix)) continue;
       for (var rowIndex = rowFrom; rowIndex <= rowTo; rowIndex++)
         for (var columnIndex = columnFrom; columnIndex <= columnTo; columnIndex++) {
           final tileId = layer.tileMatrix[rowIndex][columnIndex] - 1;
@@ -230,7 +227,7 @@ class WalkingDemoScene extends SceneBase {
           final tilesetPosition = Rect.fromLTWH(tilesetX, tilesetY, tilesetTileWidth, tilesetTileHeight);
           final screenX = columnScreenShift + (columnIndex - columnFrom) * screenColumnWidth;
           final screenY = rowScreenShift + (rowIndex - rowFrom) * screenRowHeight;
-          final screenPosition = Rect.fromLTWH(screenX, screenY, screenColumnWidth, screenRowHeight);
+          final screenPosition = Rect.fromLTWH(screenX, screenY, screenColumnWidth*1.02, screenRowHeight*1.02);
           canvas.drawImageRect(tilesetImage, tilesetPosition, screenPosition, fullPaint);
           
           if (__debug_show_grid)
