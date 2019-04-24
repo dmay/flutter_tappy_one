@@ -24,6 +24,10 @@ class WalkingPlayer {
   double speed;
 
   Tiled.Layer pass;
+  int tilesetWidth;
+  int tilesetHeight;
+  double tilesetTileWidth;
+  double tilesetTileHeight;
 
   Image spriteSheet;
 
@@ -33,7 +37,9 @@ class WalkingPlayer {
   PlayerLookingDirection _currentDirection;
   Animation _currentAnimation;
 
-  WalkingPlayer({this.x, this.y, this.speed = 64.0, this.pass});
+  WalkingPlayer({this.x, this.y, this.speed = 64.0, this.pass, 
+    this.tilesetHeight,this.tilesetWidth,
+    this.tilesetTileWidth, this.tilesetTileHeight});
 
   Future initialize() async {
     this.spriteSheet = await Flame.images.load(spriteSheetFile);
@@ -109,21 +115,71 @@ class WalkingPlayer {
         break;
       case PlayerAction.walkTo:
         final walked = speed * time;
-        final path =
-            Offset(_currentWalkToTarget.dx - x, _currentWalkToTarget.dy - y);
+        final path = Offset(_currentWalkToTarget.dx - x, _currentWalkToTarget.dy - y);
         final distance = path.distance;
         if (distance <= walked) {
           x = _currentWalkToTarget.dx;
           y = _currentWalkToTarget.dy;
           completeCurrentAction();
         } else {
-          x += path.dx * walked / distance;
-          y += path.dy * walked / distance;
+          final newX = x + path.dx * walked / distance;
+          final newY = y + path.dy * walked / distance;
+          if(canMoveTo(newX, newY)){
+            x = newX;
+            y = newY;
+          }
+          else{ // Can't move farther
+            completeCurrentAction();
+          }
         }
         break;
     }
 
     _currentAnimation?.update(time);
+  }
+
+  bool canMoveTo(double newX, double newY){
+    // Find tile
+    final mapX = (newX / tilesetTileWidth).floor();
+    final mapY = (newY / tilesetTileHeight).floor();
+    final tileId = pass.tileMatrix[mapY][mapX] - 1;
+    
+    // Simple cases - empty, and full
+    if(tileId == -1) return true;
+    if(tileId == 990) return false;
+    
+    // Find in-tile coords and quadrant
+    final tileX = (newX % tilesetTileWidth).floor();
+    final tileY = (newY % tilesetTileHeight).floor();
+    final quadrant = getTileQuadrant(tileX, tileY);
+
+    // Match cornered tiles
+    if(tileId ==  894) return quadrant == 4;
+    if(tileId ==  895) return quadrant == 3;
+    if(tileId ==  926) return quadrant == 2;
+    if(tileId ==  927) return quadrant == 1;
+
+    if(tileId ==  957) return quadrant != 4;
+    if(tileId ==  959) return quadrant != 3;
+    if(tileId == 1021) return quadrant != 2;
+    if(tileId == 1023) return quadrant != 1;
+
+    // Match halves tiles
+    if(tileId ==  958) return quadrant == 1 || quadrant == 2;
+    if(tileId ==  989) return quadrant == 1 || quadrant == 3;
+    if(tileId ==  991) return quadrant == 2 || quadrant == 4;
+    if(tileId == 1022) return quadrant == 3 || quadrant == 4;
+    
+    return true;
+  }
+
+  int getTileQuadrant(int tileX, int tileY){
+    final halfTileWidth = (tilesetTileWidth/2).floor();
+    final halfTileHeight = (tilesetTileHeight/2).floor();
+    if(tileX <  halfTileWidth && tileY <  halfTileHeight) return 1;
+    if(tileX >= halfTileWidth && tileY <  halfTileHeight) return 2;
+    if(tileX <  halfTileWidth && tileY >= halfTileHeight) return 3;
+    return 4;
   }
 
   void render(Canvas canvas, Rect visibleRect) {
@@ -166,7 +222,6 @@ class WalkingPlayer {
   void goTo(num targetX, num targetY) {
     completeCurrentAction();
     _currentAction = PlayerAction.walkTo;
-    //NOW When calculate walkToTarget - choose farthest point on the line which is available
     _currentWalkToTarget = Offset(targetX, targetY);
     _currentTimeLeft = null;
     isInAction = true;

@@ -57,7 +57,10 @@ class WalkingDemoScene extends SceneBase {
     // Spawn player
     final playerSpawn = locatePlayerOnSpawn(this.map);
     this.player = WalkingPlayer(
-        x: playerSpawn[0], y: playerSpawn[1], speed: 64, pass: passLayer);
+        x: playerSpawn[0], y: playerSpawn[1], speed: 64, 
+        pass: passLayer,
+        tilesetWidth: tilesetWidth, tilesetHeight: tilesetHeight,
+        tilesetTileWidth: tilesetTileWidth, tilesetTileHeight: tilesetTileHeight);
     await player.initialize();
 
     // Position camera
