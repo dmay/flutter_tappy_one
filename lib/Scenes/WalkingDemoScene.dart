@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:tappy_one/SceneElements/CameraFlythroughStep.dart';
 import 'package:tappy_one/SceneElements/FpsCounter.dart';
 import 'package:tappy_one/SceneElements/WalkingCamera.dart';
+import 'package:tappy_one/SceneElements/WalkingHud.dart';
 import 'package:tappy_one/SceneElements/WalkingPlayer.dart';
 import 'package:tappy_one/Scenes/SceneBase.dart';
 import 'package:tiled/tiled.dart' as Tiled;
@@ -33,8 +34,8 @@ class WalkingDemoScene extends SceneBase {
   Tiled.Layer passLayer;
 
   WalkingPlayer player;
-  Image playerImage;
   WalkingCamera camera;
+  WalkingHud hud;
   FpsCounter fpsCounter;
 
   // State information
@@ -79,6 +80,11 @@ class WalkingDemoScene extends SceneBase {
       fpsCounter.resize(screenSize);
     }
 
+    // HUD
+    this.hud = WalkingHud();
+    await hud.initialize();
+    hud.resize(screenSize);
+
     script01_Overview();
   }
 
@@ -88,6 +94,7 @@ class WalkingDemoScene extends SceneBase {
     this.player?.resize(size);
     this.camera?.resize(size);
     this.fpsCounter?.resize(size);
+    this.hud?.resize(size);
   }
 
   bool tapDown = false;
@@ -123,6 +130,7 @@ class WalkingDemoScene extends SceneBase {
   @override
   void onTap(TapDownDetails details) {
     super.onTap(details);
+    if(hud.onTap(details)) return;
     sendPlayerTo(details.globalPosition);
   }
 
@@ -157,6 +165,9 @@ class WalkingDemoScene extends SceneBase {
     // (13) Player: verify if walked into triggers
 
     // (20) Actors: update
+    
+    // HUD
+    hud?.update(time);
 
     // Camera: fly OR adjust to player
     this.camera.update(time: time, targetX: player.x, targetY: player.y);
@@ -190,7 +201,8 @@ class WalkingDemoScene extends SceneBase {
 
     renderMap('Ceiling', canvas, visibleRect);
 
-    // (14) HUD
+    // HUD
+    hud.render(canvas);
 
     // FPS rate
     fpsCounter?.render(canvas);

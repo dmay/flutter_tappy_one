@@ -46,6 +46,8 @@ flutter:
    - WalkingDemoScene.tmx
    - assets/images/terrain.png
    - assets/images/player.png
+   - assets/images/hudSwitch.png
+   - assets/images/quit.png
 
   fonts:
     - family: Alagard
