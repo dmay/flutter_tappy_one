@@ -3,7 +3,7 @@ import 'dart:ui';
 class FpsCounter {
   static const String counterFontFamily = 'Alagard';
   static const Color counterTextColor = Color(0xffffffff);
-  static const double counterTextSize = 30.0;
+  static const double counterTextSize = 26.0;
 
   Size screenSize;
 
@@ -40,7 +40,7 @@ class FpsCounter {
     var p = paragraph.build()
         ..layout(new ParagraphConstraints(width: screenSize.width));
     final paragraphX = 0.0;
-    final paragraphY = screenSize.height - p.height;
+    final paragraphY = 0.0;
     canvas.restore();
     canvas.drawParagraph(p, new Offset(paragraphX, paragraphY));
     canvas.restore();

@@ -13,21 +13,26 @@ class WalkingHud{
   double gearClosedRadius;
   Rect gearClosedRect;
   Rect gearClosedScreen;
+  Offset gearClosedCenter;
 
   Image gearOpenImage;
   double gearOpenRadius;
   Rect gearOpenRect;
   Rect gearOpenScreen;
+  Offset gearOpenCenter;
 
   double gearBottomOffset;
 
   Image closePanelImage;
 
   Paint imagePaint = BasicPalette.white.paint;
+  Paint debugPaint = Paint()
+      ..color = Color(0xFFDE1FCC)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
 
   Future initialize() async {
     // Load images
-    //NOW 2D Partial Gear icon
     this.gearClosedImage = await Flame.images.load('hudSwitch.png');
     this.gearClosedRect  = Rect.fromLTWH(0.0, 0.0, gearClosedImage.width.toDouble(), gearClosedImage.height.toDouble());
     this.gearOpenImage   = await Flame.images.load('hudSwitch.png');
@@ -47,28 +52,52 @@ class WalkingHud{
     this.gearOpenScreen   = Rect.fromLTWH(0.0, screenSize.height-gearBottomOffset-gearOpenRadius, 
       gearOpenRadius*2*gearOpenImage.width/gearOpenImage.height, 
       gearOpenRadius*2);
+    this.gearClosedCenter = Offset(gearClosedScreen.right-gearClosedRadius, gearClosedScreen.top+gearClosedRadius);
+    this.gearOpenCenter = Offset(gearOpenScreen.right-gearOpenRadius, gearOpenScreen.top+gearOpenRadius);
   }
 
   bool panelIsOpen = false;
 
   bool onTap(TapDownDetails details) {
     if(screenSize == null) return false;
+    if(panelIsOpen){
+      // Open panel
+      if(distanceIsBelow(details.globalPosition, gearOpenCenter, gearOpenRadius)){
+        panelIsOpen = false;
+        // NEXT Launch closing animation
+        return true;
+      }
+    }
+    else{
+      if(distanceIsBelow(details.globalPosition, gearClosedCenter, gearClosedRadius)){
+        panelIsOpen = true;
+        // NEXT Launch opening animation
+        return true;
+      }
+    }
     //NOW onTap - switch state
     return false;
+  }
+
+  bool distanceIsBelow(Offset a, Offset b, double radius) {
+    return (a-b).distanceSquared < radius*radius;
   }
 
   void update(double time) {
     if(screenSize == null) return;
   }
 
-  void render(Canvas canvas) {
-    //NOW render - pass 'debug' parameter, render tap areas
+  void render(Canvas canvas, bool debug) {
     if(screenSize == null) return;
     if(panelIsOpen){
       canvas.drawImageRect(gearOpenImage, gearOpenRect, gearOpenScreen, imagePaint);
+      if(debug)
+        canvas.drawCircle(gearOpenCenter, gearOpenRadius, debugPaint);
     }
     else{
       canvas.drawImageRect(gearClosedImage, gearClosedRect, gearClosedScreen, imagePaint);
+      if(debug)
+        canvas.drawCircle(gearClosedCenter, gearClosedRadius, debugPaint);
     }
   }
   

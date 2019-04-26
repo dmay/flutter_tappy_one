@@ -27,6 +27,7 @@ class WalkingDemoScene extends SceneBase {
   static const bool __debug_show_grid = false;
   static const bool __debug_show_fps = true;
   static const bool __debug_show_camera = true;
+  static const bool __debug_hud_internals = true;
 
   Tiled.TileMap map;
   Image tilesetImage;
@@ -202,7 +203,7 @@ class WalkingDemoScene extends SceneBase {
     renderMap('Ceiling', canvas, visibleRect);
 
     // HUD
-    hud.render(canvas);
+    hud.render(canvas, __debug_hud_internals);
 
     // FPS rate
     fpsCounter?.render(canvas);
