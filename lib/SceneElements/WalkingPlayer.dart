@@ -220,6 +220,7 @@ class WalkingPlayer {
   }
 
   void goTo(num targetX, num targetY) {
+    //NOW+1 Path-finding. Limit radius for user input.
     completeCurrentAction();
     _currentAction = PlayerAction.walkTo;
     _currentWalkToTarget = Offset(targetX, targetY);

@@ -1,3 +1,4 @@
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/util.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +22,7 @@ void  main() async {
   var mainLoop = MainLoop();
   mainLoop.initialize();
 
+  // NEXT: move gestureRecogniers setup into MainLoop.initialize
   var tapRecognizer = TapGestureRecognizer();
   tapRecognizer.onTapDown = mainLoop.onTapDown;
   tapRecognizer.onTap = mainLoop.onTap;

@@ -11,6 +11,19 @@ import 'package:tappy_one/Scenes/SceneBase.dart';
 import 'package:tiled/tiled.dart' as Tiled;
 import 'package:flame/flame.dart';
 
+/*
+    NEXT Basic TiledMapScene
+      must know:
+        * map parameters: file, tileset, sizes
+        * default camera position and zoom
+        * how to build a player
+      must include:
+        * camera & player
+      must let customize:
+        * additionnal components: HUD, FPS counter
+        * additionnal actors, scripting points
+ */
+
 class WalkingDemoScene extends SceneBase {
   /// delegate to navigate back to main menu
   Function goToMainMenu;

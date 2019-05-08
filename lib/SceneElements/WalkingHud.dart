@@ -43,6 +43,8 @@ class WalkingHud{
   void resize(Size screenSize) {
     this.screenSize = screenSize;
     if(screenSize == null) return;
+    
+    // Update gears positions
     this.gearClosedRadius = min(screenSize.height * 0.08,  40.0);
     this.gearOpenRadius   = min(screenSize.height * 0.10,  50.0);
     this.gearBottomOffset = min(screenSize.height * 0.10,  50.0);
@@ -54,6 +56,8 @@ class WalkingHud{
       gearOpenRadius*2);
     this.gearClosedCenter = Offset(gearClosedScreen.right-gearClosedRadius, gearClosedScreen.top+gearClosedRadius);
     this.gearOpenCenter = Offset(gearOpenScreen.right-gearOpenRadius, gearOpenScreen.top+gearOpenRadius);
+    
+    // Update panel position
   }
 
   bool panelIsOpen = false;
@@ -62,20 +66,24 @@ class WalkingHud{
     if(screenSize == null) return false;
     if(panelIsOpen){
       // Open panel
+      // Open Gear
       if(distanceIsBelow(details.globalPosition, gearOpenCenter, gearOpenRadius)){
         panelIsOpen = false;
         // NEXT Launch closing animation
         return true;
       }
+      // panelButtons.first((button) => button.onTap(details));
+      // NOW 'Go to menu' button tap
+      // Panel back
     }
     else{
+      // Closed gear
       if(distanceIsBelow(details.globalPosition, gearClosedCenter, gearClosedRadius)){
         panelIsOpen = true;
         // NEXT Launch opening animation
         return true;
       }
     }
-    //NOW onTap - switch state
     return false;
   }
 
@@ -91,6 +99,13 @@ class WalkingHud{
     if(screenSize == null) return;
     if(panelIsOpen){
       canvas.drawImageRect(gearOpenImage, gearOpenRect, gearOpenScreen, imagePaint);
+      //NOW HUD - Render open panel with 'Go to menu' button
+      // canvas.save();
+      // canvas.translate(panelOffset.dx, panelOffset.dy);
+      // canvas.drawRRect(panelRRect, panelBackgroundPaint);
+      // canvas.drawRRect(panelRRect, panelBorderPaint);
+      // panelButtons.forEach((button) => button.render(canvas));
+      // canvas.restore();
       if(debug)
         canvas.drawCircle(gearOpenCenter, gearOpenRadius, debugPaint);
     }
